@@ -19,11 +19,11 @@ export function select<T>(src: EventSource, commandCreators: CommandCreator<T, a
 export function select(src: EventSource, eventName: string): Observable<Command>
 export function select(src: EventSource, target: string | CommandCreator | CommandCreator[]): Observable<Command> {
   if (Array.isArray(target)) {
-    return merge(...target.map<Observable<Command>>(select.bind(null, src)))
+    return merge(...target.map<Observable<Command>>(select.bind(null, src))).pipe(share())
   }
   const type = typeof target === 'string' ? target : target.type
   if (isObservable(src)) {
-    return src.pipe(filter(command => command.type === type))
+    return src.pipe(filter(command => command.type === type), share())
   }
   return fromEvent<any>(src, type).pipe(
     map(command => isCommand(command) ? command : { type, payload: command }),
