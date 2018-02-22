@@ -7,11 +7,11 @@ const observable_1 = require("rxjs/symbol/observable");
 const command_1 = require("./command");
 function select(src, target) {
     if (Array.isArray(target)) {
-        return merge_1.merge(...target.map(select.bind(null, src)));
+        return merge_1.merge(...target.map(select.bind(null, src))).pipe(operators_1.share());
     }
     const type = typeof target === 'string' ? target : target.type;
     if (isObservable(src)) {
-        return src.pipe(operators_1.filter(command => command.type === type));
+        return src.pipe(operators_1.filter(command => command.type === type), operators_1.share());
     }
     return fromEvent_1.fromEvent(src, type).pipe(operators_1.map(command => command_1.isCommand(command) ? command : { type, payload: command }), operators_1.share());
 }

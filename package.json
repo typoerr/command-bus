@@ -1,7 +1,7 @@
 {
   "name": "command-bus",
   "description": "command-bus",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "cotto",
   "files": [
     "es",
