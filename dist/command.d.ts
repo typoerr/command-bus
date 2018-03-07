@@ -8,12 +8,10 @@ export interface Command<T = any> {
 export interface EmptyCommandCreator {
     (): Command<undefined>;
     type: string;
-    isolated: boolean;
 }
 export interface CommandCreator<T = any, U = T> {
-    (payload: U, meta?: Hash): Command<T>;
+    (payload: U): Command<T>;
     type: string;
-    isolated: boolean;
 }
 export declare type AnyCommandCreator = EmptyCommandCreator | CommandCreator;
 export declare function scoped(scope: string): {
@@ -28,8 +26,6 @@ export declare const create: {
 };
 export declare function match<T>(creator: CommandCreator<T, any>): (command: any) => command is Command<T>;
 export declare function isCommand(command: any): command is Command;
-export declare function isolate<T extends AnyCommandCreator>(id: string, creator: T): T;
-export declare function isolate<T extends AnyCommandCreator>(id: string, creators: T[]): T[];
-export declare function isIsolatedCommand(command: Command): boolean;
-export declare function isIsoaltedCreator(creator: AnyCommandCreator): boolean;
-export declare function getRawType(command: Command): string;
+export declare function withMeta(meta: Hash): <T extends Command<any>>(command: T) => T & {
+    meta: Hash<any>;
+};
