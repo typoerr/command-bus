@@ -1,4 +1,4 @@
-import { create, match, isCommand, scoped, isolate, isIsoaltedCreator, isIsolatedCommand, getRawType } from './command'
+import { create, match, isCommand, scoped, withMeta } from './command'
 
 test('create emptry command creator', () => {
   const COMMAND = create('A')
@@ -24,25 +24,9 @@ test('scoped', () => {
   const C = A('C', (s: string) => s.length)
 
   expect(B.type).toBe('A/B')
-  expect(B.isolated).toBe(false)
   expect(C.type).toBe('A/C')
-  expect(C.isolated).toBe(false)
   expect(B(1)).toEqual({ type: 'A/B', payload: 1 })
-  expect(C('abc', { context: true })).toEqual({ type: 'A/C', payload: 3, meta: { context: true } })
-})
-
-test('isolate / isIsolatedXXX / getRawType', () => {
-  const _A = create<number>('A')
-  const _B = create('B')
-  const [A, B] = isolate('1', [_A, _B])
-  const command = B(1)
-  expect(isIsoaltedCreator(A)).toBe(true)
-  expect(isIsoaltedCreator(_A)).toBe(false)
-  expect(_B.type).toBe('B')
-  expect(B.type).toBe('B#1')
-  expect(command).toEqual({ type: 'B#1', payload: 1, _isolated: true })
-  expect(isIsolatedCommand(command)).toBe(true)
-  expect(getRawType(command)).toBe('B')
+  expect(C('abc')).toEqual({ type: 'A/C', payload: 3 })
 })
 
 test('match', () => {
