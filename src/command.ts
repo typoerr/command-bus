@@ -16,7 +16,7 @@ export interface EmptyCommandCreator {
 }
 
 export interface CommandCreator<T = any, U = T> {
-  (payload: U, meta?: Hash): Command<T>
+  (payload: U): Command<T>
   type: string
 }
 
@@ -25,8 +25,8 @@ export type AnyCommandCreator = EmptyCommandCreator | CommandCreator
 //
 // ─── COMMAND CREATOR ────────────────────────────────────────────────────────────
 //
-function createCommand<T>(type: string, payload: T, meta: Hash) {
-  return meta ? { type, payload, meta } : { type, payload }
+function createCommand<T>(type: string, payload: T) {
+  return { type, payload }
 }
 
 export function scoped(scope: string) {
@@ -36,7 +36,7 @@ export function scoped(scope: string) {
   function _create<T, U>(type: string, fn: (val: U) => T): CommandCreator<T, U>
   function _create(type: string, fn = identity): CommandCreator {
     const _type = scope + type
-    const creator: any = (payload: any, meta?: any) => createCommand(_type, fn(payload), meta)
+    const creator: any = (payload: any) => createCommand(_type, fn(payload))
     creator.type = _type
     return creator
   }
@@ -57,3 +57,6 @@ export function isCommand(command: any): command is Command {
   return Object(command) === command && typeof command.type === 'string'
 }
 
+export function withMeta(meta: Hash) {
+  return <T extends Command>(command: T) => Object.assign({}, command, { meta })
+}

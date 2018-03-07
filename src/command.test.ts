@@ -43,3 +43,8 @@ test('isCommand', () => {
   expect(isCommand(null)).toBe(false)
 })
 
+test('withMeta', () => {
+  const applyContext = withMeta({ context: true })
+  const A = create<number>('A')
+  expect(applyContext(A(1))).toEqual({ type: 'A', payload: 1, meta: { context: true } })
+})
