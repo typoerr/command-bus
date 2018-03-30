@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { Command, CommandCreator, EmptyCommandCreator } from './command';
+import { Command, AnyCommandCreator } from './command';
 export declare type EventTargetLike = EventTarget | {
     addListener: any;
     removeListener: any;
@@ -8,7 +8,5 @@ export declare type EventTargetLike = EventTarget | {
     off: any;
 };
 export declare type EventSource<T = any> = EventTargetLike | Observable<Command<T>>;
-export declare function select(src: EventSource, commandCreator: EmptyCommandCreator): Observable<Command<undefined>>;
-export declare function select<T>(src: EventSource, commandCreator: CommandCreator<T, any>): Observable<Command<T>>;
-export declare function select<T>(src: EventSource, commandCreators: CommandCreator<T, any>[]): Observable<Command<T>>;
-export declare function select(src: EventSource, eventName: string): Observable<Command>;
+export declare type Selectable<T = any> = string | AnyCommandCreator<T> | AnyCommandCreator<T>[];
+export declare function select<T>(src: EventSource, target: Selectable<T>): Observable<Command<T>>;

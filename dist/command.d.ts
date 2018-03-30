@@ -13,7 +13,7 @@ export interface CommandCreator<T = any, U = T> {
     (payload: U): Command<T>;
     type: string;
 }
-export declare type AnyCommandCreator = EmptyCommandCreator | CommandCreator;
+export declare type AnyCommandCreator<T = any> = EmptyCommandCreator | CommandCreator<T>;
 export declare function scoped(scope: string): {
     (type: string): EmptyCommandCreator;
     <T>(type: string): CommandCreator<T, T>;
@@ -24,7 +24,7 @@ export declare const create: {
     <T>(type: string): CommandCreator<T, T>;
     <T, U>(type: string, fn: (val: U) => T): CommandCreator<T, U>;
 };
-export declare function match<T>(creator: CommandCreator<T, any>): (command: any) => command is Command<T>;
+export declare function match<T>(creator: AnyCommandCreator<T>): (command: any) => command is Command<T>;
 export declare function isCommand(command: any): command is Command;
 export declare function withMeta(meta: Hash): <T extends Command<any>>(command: T) => T & {
     meta: Hash<any>;
