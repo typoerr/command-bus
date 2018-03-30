@@ -20,7 +20,7 @@ export interface CommandCreator<T = any, U = T> {
   type: string
 }
 
-export type AnyCommandCreator = EmptyCommandCreator | CommandCreator
+export type AnyCommandCreator<T = any> = EmptyCommandCreator | CommandCreator<T>
 
 //
 // ─── COMMAND CREATOR ────────────────────────────────────────────────────────────
