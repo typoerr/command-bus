@@ -3,7 +3,7 @@ import { fromEvent } from 'rxjs/observable/fromEvent'
 import { merge } from 'rxjs/observable/merge'
 import { map, filter, share } from 'rxjs/operators'
 import { observable } from 'rxjs/symbol/observable'
-import { Command, CommandCreator, isCommand, EmptyCommandCreator } from './command'
+import { Command, isCommand, AnyCommandCreator } from './command'
 
 export type EventTargetLike =
   | EventTarget
@@ -11,13 +11,9 @@ export type EventTargetLike =
   | { on: any, off: any }
 
 export type EventSource<T = any> = EventTargetLike | Observable<Command<T>>
+export type Selectable<T = any> = string | AnyCommandCreator<T> | AnyCommandCreator<T>[]
 
-// tslint:disable:unified-signatures
-export function select(src: EventSource, commandCreator: EmptyCommandCreator): Observable<Command<undefined>>
-export function select<T>(src: EventSource, commandCreator: CommandCreator<T, any>): Observable<Command<T>>
-export function select<T>(src: EventSource, commandCreators: CommandCreator<T, any>[]): Observable<Command<T>>
-export function select(src: EventSource, eventName: string): Observable<Command>
-export function select(src: EventSource, target: string | CommandCreator | CommandCreator[]): Observable<Command> {
+export function select<T>(src: EventSource, target: Selectable<T>): Observable<Command<T>> {
   if (Array.isArray(target)) {
     return merge(...target.map<Observable<Command>>(select.bind(null, src))).pipe(share())
   }
