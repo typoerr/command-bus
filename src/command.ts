@@ -47,7 +47,7 @@ export const create = scoped('')
 //
 // ─── UTILS ──────────────────────────────────────────────────────────────────────
 //
-export function match<T>(creator: CommandCreator<T, any>) {
+export function match<T>(creator: AnyCommandCreator<T>) {
   return (command: any): command is Command<T> => {
     return command != null && command.type === creator.type
   }
