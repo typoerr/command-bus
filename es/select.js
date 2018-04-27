@@ -1,7 +1,5 @@
-import { fromEvent } from 'rxjs/observable/fromEvent';
-import { merge } from 'rxjs/observable/merge';
+import { fromEvent, merge, observable } from 'rxjs';
 import { map, filter, share } from 'rxjs/operators';
-import { observable } from 'rxjs/symbol/observable';
 import { isCommand } from './command';
 export function select(src, target) {
     if (Array.isArray(target)) {

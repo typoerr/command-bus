@@ -1,6 +1,9 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Command, AnyCommandCreator } from './command';
-export declare type EventTargetLike = EventTarget | {
+export declare type EventTargetLike = {
+    addEventListener: any;
+    removeEventListener: any;
+} | {
     addListener: any;
     removeListener: any;
 } | {
