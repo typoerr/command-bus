@@ -1,12 +1,9 @@
-import { Observable } from 'rxjs/Observable'
-import { fromEvent } from 'rxjs/observable/fromEvent'
-import { merge } from 'rxjs/observable/merge'
+import { Observable, fromEvent, merge, observable } from 'rxjs'
 import { map, filter, share } from 'rxjs/operators'
-import { observable } from 'rxjs/symbol/observable'
 import { Command, isCommand, AnyCommandCreator } from './command'
 
 export type EventTargetLike =
-  | EventTarget
+  | { addEventListener: any, removeEventListener: any }
   | { addListener: any, removeListener: any }
   | { on: any, off: any }
 
@@ -21,7 +18,7 @@ export function select<T>(src: EventSource, target: Selectable<T>): Observable<C
   if (isObservable(src)) {
     return src.pipe(filter(command => command.type === type), share())
   }
-  return fromEvent<any>(src, type).pipe(
+  return fromEvent(src, type).pipe(
     map(command => isCommand(command) ? command : { type, payload: command }),
     share(),
   )

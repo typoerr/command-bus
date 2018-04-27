@@ -1,8 +1,7 @@
+import { merge, of } from 'rxjs'
 import { select, EventSource } from './select'
 import { Dispatcher } from './dispatcher'
 import { create, Command } from './command'
-import { merge } from 'rxjs/observable/merge'
-import { of } from 'rxjs/observable/of'
 import { tap, take, toArray } from 'rxjs/operators'
 
 const ACTION = {
