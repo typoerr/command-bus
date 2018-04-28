@@ -4,7 +4,6 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./command"));
-__export(require("./dispatcher"));
 __export(require("./select"));
 __export(require("./command-bus"));
 //# sourceMappingURL=index.js.map
