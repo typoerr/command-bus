@@ -1,6 +1,5 @@
 import { merge, of } from 'rxjs'
 import { select, EventSource } from './select'
-import { Dispatcher } from './dispatcher'
 import { createCommandBus } from './command-bus'
 import { create, Command } from './command'
 import { tap, take, toArray } from 'rxjs/operators'
@@ -23,29 +22,6 @@ test('select command from command-bus', done => {
   bus.dispatch(ACTION.FOO(1))
 })
 
-test('select command from dispatcher', done => {
-  expect.assertions(1)
-  const dispatcher = new Dispatcher()
-  const action = ACTION.FOO(1)
-  const action$ = select(dispatcher, ACTION.FOO).pipe(
-    tap(evaluate(action)),
-  )
-  action$.subscribe(done.bind(undefined, undefined))
-  dispatcher.dispatch(action)
-})
-
-test('select commands from dispatcher', done => {
-  expect.assertions(1)
-  const dispatcher = new Dispatcher()
-  const action$ = select(dispatcher, [ACTION.BAR, ACTION.BAZ]).pipe(take(2), toArray())
-  action$.subscribe(commands => {
-    expect(commands).toEqual([ACTION.BAR('BAR'), ACTION.BAZ('BAZ')])
-    done()
-  })
-  dispatcher.dispatch(ACTION.FOO(1))
-  dispatcher.dispatch(ACTION.BAR('BAR'))
-  dispatcher.dispatch(ACTION.BAZ('BAZ'))
-})
 
 test('select command from action$', () => {
   expect.assertions(1)
@@ -63,13 +39,13 @@ test('select commands from action$', async () => {
   expect(commands).toEqual([ACTION.BAR('BAR'), ACTION.BAZ('BAZ')])
 })
 
-test('select eventName from dispatcher', done => {
+test('select command from eventname', done => {
   expect.assertions(1)
-  const dispatcher = new Dispatcher()
-  const action$ = select(dispatcher, ACTION.FOO.type).pipe(
+  const bus = createCommandBus()
+  const action$ = select(bus, ACTION.FOO.type).pipe(
     tap(evaluate(ACTION.FOO(1))),
   ).subscribe(done.bind(undefined, undefined))
-  dispatcher.dispatch(ACTION.FOO(1))
-  dispatcher.dispatch(ACTION.BAR('BAR'))
-  dispatcher.dispatch(ACTION.BAZ('BAZ'))
+  bus.dispatch(ACTION.FOO(1))
+  bus.dispatch(ACTION.BAR('BAR'))
+  bus.dispatch(ACTION.BAZ('BAZ'))
 })
