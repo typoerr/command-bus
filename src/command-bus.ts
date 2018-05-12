@@ -1,13 +1,13 @@
 import { Command, AnyCommandCreator } from './command'
 
-export type BusTarget<T = any> = typeof WILDECARD | symbol | string | AnyCommandCreator<T>
+export type BusTarget<T = any> = typeof WILDCARD | symbol | string | AnyCommandCreator<T>
 export type CommandListener<T = any> = (commad: Command<T>) => any
 export type CommandBus = ReturnType<typeof createCommandBus>
 
-export const WILDECARD = '*'
+export const WILDCARD = '*'
 
 function isWildcard(type: string | symbol) {
-  return type === WILDECARD
+  return type === WILDCARD
 }
 
 function getEventName(target: BusTarget) {
