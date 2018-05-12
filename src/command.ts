@@ -1,5 +1,3 @@
-import { identity, Hash } from '@cotto/utils.ts'
-
 //
 // ─── TYPES ──────────────────────────────────────────────────────────────────────
 //
@@ -16,8 +14,13 @@ export interface EmptyCommandCreator {
 }
 
 export interface CommandCreator<T = any, U = T> {
-  (payload: U): Command<T>
+  (src: U): Command<T>
   type: string
+}
+
+export type CommandSrcMapper<T, U = undefined> = (value: T) => {
+  payload?: U
+  [key: string]: any,
 }
 
 export type AnyCommandCreator<T = any> = EmptyCommandCreator | CommandCreator<T>
@@ -25,19 +28,20 @@ export type AnyCommandCreator<T = any> = EmptyCommandCreator | CommandCreator<T>
 //
 // ─── COMMAND CREATOR ────────────────────────────────────────────────────────────
 //
-function createCommand<T>(type: string, payload: T) {
-  return { type, payload }
+function defaultCommandMapper(payload: any): any {
+  return { payload }
 }
 
 export function scoped(scope: string) {
-  return _create
-  function _create(type: string): EmptyCommandCreator
-  function _create<T>(type: string): CommandCreator<T>
-  function _create<T, U>(type: string, fn: (val: U) => T): CommandCreator<T, U>
-  function _create(type: string, fn = identity): CommandCreator {
-    const _type = scope + type
-    const creator: any = (payload: any) => createCommand(_type, fn(payload))
-    creator.type = _type
+  return factory
+
+  function factory(type: string): EmptyCommandCreator
+  function factory<T>(type: string): CommandCreator<T>
+  function factory<T = undefined, U = any>(type: string, mapper: CommandSrcMapper<U, T>): CommandCreator<T, U>
+  function factory(type: string, mapper = defaultCommandMapper): CommandCreator {
+    type = scope + type
+    const creator: any = (src: any) => ({ type, payload: undefined, ...mapper(src) })
+    creator.type = type
     return creator
   }
 }
@@ -55,8 +59,4 @@ export function match<T>(creator: AnyCommandCreator<T>) {
 
 export function isCommand(command: any): command is Command {
   return Object(command) === command && typeof command.type === 'string'
-}
-
-export function withMeta(meta: Hash) {
-  return <T extends Command>(command: T) => Object.assign({}, command, { meta })
 }

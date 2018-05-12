@@ -1,4 +1,4 @@
-import { create, match, isCommand, scoped, withMeta } from './command'
+import { create, match, isCommand, scoped } from './command'
 
 test('create emptry command creator', () => {
   const COMMAND = create('A')
@@ -6,27 +6,25 @@ test('create emptry command creator', () => {
   expect(COMMAND.type).toBe('A')
 })
 
-test('create command creator', () => {
+test('create typed command creator', () => {
   const COMMAND = create<number>('A')
   expect(COMMAND(1)).toEqual({ type: 'A', payload: 1 })
   expect(COMMAND.type).toBe('A')
 })
 
-test('create command creator with payload creator', () => {
-  const COMMAND = create('A', (s: string) => s.length)
-  expect(COMMAND('hello')).toEqual({ type: 'A', payload: 5 })
-  expect(COMMAND.type).toBe('A')
+test('create command creator with mapper', () => {
+  const A = create('A', (s: string) => ({ payload: s.length, meta: true }))
+  const B = create('B', (cond: boolean) => ({ meta: cond }))
+  expect(A('hello')).toEqual({ type: 'A', payload: 5, meta: true })
+  expect(B(true)).toEqual({ type: 'B', payload: undefined, meta: true })
+  expect(A.type).toBe('A')
+  expect(B.type).toBe('B')
 })
 
 test('scoped', () => {
-  const A = scoped('A/')
-  const B = A<number>('B')
-  const C = A('C', (s: string) => s.length)
-
-  expect(B.type).toBe('A/B')
-  expect(C.type).toBe('A/C')
-  expect(B(1)).toEqual({ type: 'A/B', payload: 1 })
-  expect(C('abc')).toEqual({ type: 'A/C', payload: 3 })
+  const COMMAND = scoped('A/')('B')
+  expect(COMMAND.type).toBe('A/B')
+  expect(COMMAND()).toEqual({ type: 'A/B', payload: undefined })
 })
 
 test('match', () => {
@@ -41,10 +39,4 @@ test('isCommand', () => {
   const A = create('A')
   expect(isCommand(A)).toBe(true)
   expect(isCommand(null)).toBe(false)
-})
-
-test('withMeta', () => {
-  const applyContext = withMeta({ context: true })
-  const A = create<number>('A')
-  expect(applyContext(A(1))).toEqual({ type: 'A', payload: 1, meta: { context: true } })
 })
