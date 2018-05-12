@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WILDECARD = '*';
+exports.WILDCARD = '*';
 function isWildcard(type) {
-    return type === exports.WILDECARD;
+    return type === exports.WILDCARD;
 }
 function getEventName(target) {
     return (typeof target === 'string' || typeof target === 'symbol')

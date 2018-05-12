@@ -1,6 +1,6 @@
-export const WILDECARD = '*';
+export const WILDCARD = '*';
 function isWildcard(type) {
-    return type === WILDECARD;
+    return type === WILDCARD;
 }
 function getEventName(target) {
     return (typeof target === 'string' || typeof target === 'symbol')
