@@ -9,42 +9,22 @@ export interface Command<T = any> {
   [key: string]: any
 }
 
-export interface EmptyCommandCreator {
-  (): Command<undefined>
-  type: string
-}
+export type CommandCreator<P, T> = T extends undefined | never
+  ? { type: string, (): Command<P> }
+  : { type: string, (src: T): Command<P> }
 
-export interface CommandCreator<T = any, U = T> {
-  (src: U): Command<T>
-  type: string
-}
+export type AnyCommandCreator<P = undefined> = CommandCreator<P, any>
 
-export type AnyCommandCreator<T = any> = EmptyCommandCreator | CommandCreator<T>
-
-export type PayloadMapper<T, R> = (val: T) => R
-export type Extra<T> = (value: T) => { [key: string]: any }
-
-//
-// ─── COMMAND CREATOR ────────────────────────────────────────────────────────────
-//
 export function scoped(scope: string) {
-  return factory
-
-  function factory(type: string): EmptyCommandCreator
-  function factory<T>(type: string): CommandCreator<T>
-  function factory<T = undefined, U = any>(
+  return function createCreator<P = undefined, T = P>(
     type: string,
-    payload: PayloadMapper<U, T>,
-    extra?: Extra<any>,
-  ): CommandCreator<T, U>
-  function factory(
-    type: string, payload = identity,
-    extra?: Extra<any>,
-  ): CommandCreator {
+    mapper: (value: T) => P = identity as any,
+    extra?: (value: T) => { [key: string]: any },
+  ): CommandCreator<P, T> {
     type = scope + type
-    const creator: any = (src: any) => ({ type, payload: payload(src), ...extra ? extra(src) : {} })
-    creator.type = type
-    return creator
+    const f: any = (src: any) => ({ type, payload: mapper(src), ...extra ? extra(src) : {} })
+    f.type = type
+    return f
   }
 }
 

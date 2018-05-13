@@ -1,15 +1,15 @@
 import { create, match, isCommand, scoped } from './command'
 
 test('create emptry command creator', () => {
-  const COMMAND = create('A')
-  expect(COMMAND()).toEqual({ type: 'A', payload: undefined })
-  expect(COMMAND.type).toBe('A')
+  const A = create('A')
+  expect(A()).toEqual({ type: 'A', payload: undefined })
+  expect(A.type).toBe('A')
 })
 
 test('create typed command creator', () => {
-  const COMMAND = create<number>('A')
-  expect(COMMAND(1)).toEqual({ type: 'A', payload: 1 })
-  expect(COMMAND.type).toBe('A')
+  const A = create<number>('A')
+  expect(A(1)).toEqual({ type: 'A', payload: 1 })
+  expect(A.type).toBe('A')
 })
 
 test('create command creator with payload mapper', () => {
