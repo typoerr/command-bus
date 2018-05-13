@@ -12,13 +12,16 @@ test('create typed command creator', () => {
   expect(COMMAND.type).toBe('A')
 })
 
-test('create command creator with mapper', () => {
-  const A = create('A', (s: string) => ({ payload: s.length, meta: true }))
-  const B = create('B', (cond: boolean) => ({ meta: cond }))
-  expect(A('hello')).toEqual({ type: 'A', payload: 5, meta: true })
-  expect(B(true)).toEqual({ type: 'B', payload: undefined, meta: true })
+test('create command creator with payload mapper', () => {
+  const A = create('A', (s: string) => s.length)
+  expect(A('hello')).toEqual({ type: 'A', payload: 5 })
   expect(A.type).toBe('A')
-  expect(B.type).toBe('B')
+})
+
+test('create command creator with meta mapper', () => {
+  const A = create('A', (s: string) => s.length, (s: string) => ({ meta: s.length }))
+  expect(A('hello')).toEqual({ type: 'A', payload: 5, meta: 5 })
+  expect(A.type).toBe('A')
 })
 
 test('scoped', () => {

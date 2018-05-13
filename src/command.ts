@@ -1,3 +1,4 @@
+import { identity } from '@cotto/utils.ts'
 //
 // ─── TYPES ──────────────────────────────────────────────────────────────────────
 //
@@ -18,29 +19,30 @@ export interface CommandCreator<T = any, U = T> {
   type: string
 }
 
-export type CommandSrcMapper<T, U = undefined> = (value: T) => {
-  payload?: U
-  [key: string]: any,
-}
-
 export type AnyCommandCreator<T = any> = EmptyCommandCreator | CommandCreator<T>
+
+export type PayloadMapper<T, R> = (val: T) => R
+export type Extra<T> = (value: T) => { [key: string]: any }
 
 //
 // ─── COMMAND CREATOR ────────────────────────────────────────────────────────────
 //
-function defaultCommandMapper(payload: any): any {
-  return { payload }
-}
-
 export function scoped(scope: string) {
   return factory
 
   function factory(type: string): EmptyCommandCreator
   function factory<T>(type: string): CommandCreator<T>
-  function factory<T = undefined, U = any>(type: string, mapper: CommandSrcMapper<U, T>): CommandCreator<T, U>
-  function factory(type: string, mapper = defaultCommandMapper): CommandCreator {
+  function factory<T = undefined, U = any>(
+    type: string,
+    payload: PayloadMapper<U, T>,
+    extra?: Extra<any>,
+  ): CommandCreator<T, U>
+  function factory(
+    type: string, payload = identity,
+    extra?: Extra<any>,
+  ): CommandCreator {
     type = scope + type
-    const creator: any = (src: any) => ({ type, payload: undefined, ...mapper(src) })
+    const creator: any = (src: any) => ({ type, payload: payload(src), ...extra ? extra(src) : {} })
     creator.type = type
     return creator
   }
