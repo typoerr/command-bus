@@ -4,28 +4,19 @@ export interface Command<T = any> {
     meta?: any;
     [key: string]: any;
 }
-export interface EmptyCommandCreator {
-    (): Command<undefined>;
+export declare type CommandCreator<P, T> = T extends undefined | never ? {
     type: string;
-}
-export interface CommandCreator<T = any, U = T> {
-    (src: U): Command<T>;
+    (): Command<P>;
+} : {
     type: string;
-}
-export declare type CommandSrcMapper<T, U = undefined> = (value: T) => {
-    payload?: U;
+    (src: T): Command<P>;
+};
+export declare type AnyCommandCreator<P = undefined> = CommandCreator<P, any>;
+export declare function scoped(scope: string): <P = undefined, T = P>(type: string, mapper?: (value: T) => P, extra?: ((value: T) => {
     [key: string]: any;
-};
-export declare type AnyCommandCreator<T = any> = EmptyCommandCreator | CommandCreator<T>;
-export declare function scoped(scope: string): {
-    (type: string): EmptyCommandCreator;
-    <T>(type: string): CommandCreator<T, T>;
-    <T = undefined, U = any>(type: string, mapper: CommandSrcMapper<U, T>): CommandCreator<T, U>;
-};
-export declare const create: {
-    (type: string): EmptyCommandCreator;
-    <T>(type: string): CommandCreator<T, T>;
-    <T = undefined, U = any>(type: string, mapper: CommandSrcMapper<U, T>): CommandCreator<T, U>;
-};
+}) | undefined) => CommandCreator<P, T>;
+export declare const create: <P = undefined, T = P>(type: string, mapper?: (value: T) => P, extra?: ((value: T) => {
+    [key: string]: any;
+}) | undefined) => CommandCreator<P, T>;
 export declare function match<T>(creator: AnyCommandCreator<T>): (command: any) => command is Command<T>;
 export declare function isCommand(command: any): command is Command;

@@ -1,19 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-//
-// ─── COMMAND CREATOR ────────────────────────────────────────────────────────────
-//
-function defaultCommandMapper(payload) {
-    return { payload };
-}
+const utils_ts_1 = require("@cotto/utils.ts");
 function scoped(scope) {
-    return factory;
-    function factory(type, mapper = defaultCommandMapper) {
+    return function createCreator(type, mapper = utils_ts_1.identity, extra) {
         type = scope + type;
-        const creator = (src) => (Object.assign({ type, payload: undefined }, mapper(src)));
-        creator.type = type;
-        return creator;
-    }
+        const f = (src) => (Object.assign({ type, payload: mapper(src) }, extra ? extra(src) : {}));
+        f.type = type;
+        return f;
+    };
 }
 exports.scoped = scoped;
 exports.create = scoped('');
