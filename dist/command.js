@@ -2,12 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_ts_1 = require("@cotto/utils.ts");
 function scoped(scope) {
-    return function createCreator(type, mapper = utils_ts_1.identity, extra) {
+    return factory;
+    function factory(type, mapper = utils_ts_1.identity, extra) {
         type = scope + type;
         const f = (src) => (Object.assign({ type, payload: mapper(src) }, extra ? extra(src) : {}));
         f.type = type;
         return f;
-    };
+    }
 }
 exports.scoped = scoped;
 exports.create = scoped('');
