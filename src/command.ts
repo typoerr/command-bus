@@ -1,4 +1,4 @@
-import { identity } from '@cotto/utils.ts'
+import { identity, Hash } from '@cotto/utils.ts'
 //
 // ─── TYPES ──────────────────────────────────────────────────────────────────────
 //
@@ -9,18 +9,23 @@ export interface Command<T = any> {
   [key: string]: any
 }
 
-export type CommandCreator<P, T> = T extends undefined | never
+export type CommandCreator<P, T = undefined> = T extends undefined | never
   ? { type: string, (): Command<P> }
-  : { type: string, (src: T): Command<P> }
+  : { type: string, (value: T): Command<P> }
 
-export type AnyCommandCreator<P = undefined> = CommandCreator<P, any>
+export type AnyCommandCreator<P> = CommandCreator<P, any>
 
 export function scoped(scope: string) {
-  return function createCreator<P = undefined, T = P>(
-    type: string,
-    mapper: (value: T) => P = identity as any,
-    extra?: (value: T) => { [key: string]: any },
-  ): CommandCreator<P, T> {
+  return factory
+
+  function factory(type: string): CommandCreator<undefined>
+  function factory<P>(type: string): CommandCreator<P, P>
+  function factory<P>(type: string, mapper: () => P): CommandCreator<P>
+  function factory<P>(type: string, mapper: () => P, extra?: () => Hash): CommandCreator<P>
+  function factory<P, T>(type: string, mapper: () => P, extra?: (value: T) => Hash): CommandCreator<P, T>
+  function factory<P, T>(type: string, mapper: (value: T) => P, extra?: () => Hash): CommandCreator<P, T>
+  function factory<P, T>(type: string, mapper: (value: T) => P, extra?: (value: T) => Hash): CommandCreator<P, T>
+  function factory(type: string, mapper = identity, extra?: (value?: any) => Hash) {
     type = scope + type
     const f: any = (src: any) => ({ type, payload: mapper(src), ...extra ? extra(src) : {} })
     f.type = type

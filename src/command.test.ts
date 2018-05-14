@@ -14,14 +14,19 @@ test('create typed command creator', () => {
 
 test('create command creator with payload mapper', () => {
   const A = create('A', (s: string) => s.length)
+  const B = create('B', () => 1)
   expect(A('hello')).toEqual({ type: 'A', payload: 5 })
   expect(A.type).toBe('A')
+  expect(B()).toEqual({ type: 'B', payload: 1 })
+  expect(B.type).toBe('B')
 })
 
 test('create command creator with meta mapper', () => {
   const A = create('A', (s: string) => s.length, (s: string) => ({ meta: s.length }))
+  const B = create('B', () => undefined, (i: number) => ({ meta: i }))
   expect(A('hello')).toEqual({ type: 'A', payload: 5, meta: 5 })
   expect(A.type).toBe('A')
+  expect(B(1)).toEqual({ type: 'B', payload: undefined, meta: 1 })
 })
 
 test('scoped', () => {
