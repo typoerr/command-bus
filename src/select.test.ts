@@ -1,8 +1,10 @@
 import { merge, of } from 'rxjs'
 import { select, EventSource } from './select'
 import { createCommandBus } from './command-bus'
-import { create, Command } from './command'
+import { factory, Command } from './command'
 import { tap, take, toArray } from 'rxjs/operators'
+
+const create = factory('')
 
 const ACTION = {
   FOO: create<number>('FOO'),

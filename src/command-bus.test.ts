@@ -1,5 +1,7 @@
 import { createCommandBus } from './command-bus'
-import { create } from './command'
+import { factory } from './command'
+
+const create = factory('')
 
 const COMMAND = create<number>('COMMAND')
 
