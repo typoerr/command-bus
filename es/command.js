@@ -1,14 +1,13 @@
 import { identity } from '@cotto/utils.ts';
-export function scoped(scope) {
-    return factory;
-    function factory(type, mapper = identity, extra) {
+export function factory(scope) {
+    return create;
+    function create(type, mapper = identity, extra) {
         type = scope + type;
         const f = (src) => (Object.assign({ type, payload: mapper(src) }, extra ? extra(src) : {}));
         f.type = type;
         return f;
     }
 }
-export const create = scoped('');
 //
 // ─── UTILS ──────────────────────────────────────────────────────────────────────
 //

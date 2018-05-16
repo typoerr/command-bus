@@ -4,8 +4,7 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 var command_1 = require("./command");
-exports.create = command_1.create;
-exports.scoped = command_1.scoped;
+exports.factory = command_1.factory;
 exports.match = command_1.match;
 exports.isCommand = command_1.isCommand;
 __export(require("./select"));
