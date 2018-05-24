@@ -43,8 +43,8 @@
   "keywords": [],
   "scripts": {
     "compile": "npm-run-all compile:*",
-    "compile:dist": "tsc --module commonjs --outDir dist",
-    "compile:es": "tsc --module es2015 --outDir es",
+    "compile:dist": "tsc --p ./tsconfig.pkg.json --module commonjs --outDir dist",
+    "compile:es": "tsc --p ./tsconfig.pkg.json --module es2015 --outDir es",
     "clean": "run-p clean:**",
     "clean:dist": "rimraf dist",
     "clean:es": "rimraf es",
