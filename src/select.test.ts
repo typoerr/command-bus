@@ -1,8 +1,8 @@
-import { merge, of } from 'rxjs'
-import { select, EventSource } from './select'
+import { of } from 'rxjs'
+import { select } from './select'
 import { createCommandBus } from './command-bus'
 import { factory, Command } from './command'
-import { tap, take, toArray } from 'rxjs/operators'
+import { tap, toArray } from 'rxjs/operators'
 
 const create = factory('')
 
@@ -46,7 +46,9 @@ test('select command from eventname', done => {
   const bus = createCommandBus()
   const action$ = select(bus, ACTION.FOO.type).pipe(
     tap(evaluate(ACTION.FOO(1))),
-  ).subscribe(done.bind(undefined, undefined))
+  )
+
+  action$.subscribe(done.bind(undefined, undefined))
   bus.dispatch(ACTION.FOO(1))
   bus.dispatch(ACTION.BAR('BAR'))
   bus.dispatch(ACTION.BAZ('BAZ'))
