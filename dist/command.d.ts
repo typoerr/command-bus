@@ -5,7 +5,7 @@ export interface Command<T = any> {
     meta?: any;
     [key: string]: any;
 }
-export declare type CommandCreator<P, T> = T extends undefined | never ? {
+export declare type CommandCreator<P, T> = T extends void | never ? {
     type: string;
     (): Command<P>;
 } : {
