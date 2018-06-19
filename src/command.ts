@@ -1,4 +1,4 @@
-import { identity, Hash } from '@cotto/utils.ts'
+import { identity, HashMap } from '@cotto/utils.ts'
 //
 // ─── TYPES ──────────────────────────────────────────────────────────────────────
 //
@@ -21,11 +21,11 @@ export function factory(scope: string) {
   function create(type: string): CommandCreator<undefined, void>
   function create<P>(type: string): CommandCreator<P, P>
   function create<P>(type: string, mapper: () => P): CommandCreator<P, void>
-  function create<P>(type: string, mapper: () => P, extra?: () => Hash): CommandCreator<P, void>
-  function create<P, U>(type: string, mapper: () => P, extra?: (value: U) => Hash): CommandCreator<P, U>
-  function create<P, U>(type: string, mapper: (value: U) => P, extra?: () => Hash): CommandCreator<P, U>
-  function create<P, U>(type: string, mapper: (value: U) => P, extra?: (value: U) => Hash): CommandCreator<P, U>
-  function create(type: string, mapper = identity, extra?: (value?: any) => Hash) {
+  function create<P>(type: string, mapper: () => P, extra?: () => HashMap): CommandCreator<P, void>
+  function create<P, U>(type: string, mapper: () => P, extra?: (value: U) => HashMap): CommandCreator<P, U>
+  function create<P, U>(type: string, mapper: (value: U) => P, extra?: () => HashMap): CommandCreator<P, U>
+  function create<P, U>(type: string, mapper: (value: U) => P, extra?: (value: U) => HashMap): CommandCreator<P, U>
+  function create(type: string, mapper = identity, extra?: (value?: any) => HashMap) {
     type = scope + type
     const f: any = (src: any) => ({ type, payload: mapper(src), ...extra ? extra(src) : {} })
     f.type = type
