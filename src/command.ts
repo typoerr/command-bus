@@ -1,47 +1,86 @@
-import { identity, HashMap } from '@cotto/utils.ts'
+import { HashMap, isObject } from '@cotto/utils.ts'
+
 //
 // ─── TYPES ──────────────────────────────────────────────────────────────────────
 //
-export interface Command<T = any> {
+// tslint:disable:max-line-length
+export type OverwriteRet<Fn, R> =
+  Fn extends (() => any) ? (() => R) :
+  Fn extends ((a: infer A) => any) ? (a: A) => R :
+  Fn extends ((a: infer A, b: infer B) => any) ? (a: A, b: B) => R :
+  Fn extends ((a: infer A, b: infer B, c: infer C) => any) ? (a: A, b: B, c: C) => R :
+  Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D) => any) ? (a: A, b: B, c: C, d: D) => R :
+  Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D, e: infer E) => any) ? (a: A, b: B, c: C, d: D, e: E) => R :
+  Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D, e: infer E, f: infer F) => any) ? (a: A, b: B, c: C, d: D, e: E, f: F) => R :
+  never
+// tslint:enable:max-line-length
+
+interface AnyFunction {
+  (...value: any[]): any
+}
+
+export type Command<T = {}> = T extends HashMap
+  ? { type: string } & T
+  : { type: string, payload: T }
+
+export interface AnyCommand {
   type: string
-  payload: T,
-  meta?: any
   [key: string]: any
 }
 
-export type CommandCreator<P, T> = T extends void | never
-  ? { type: string, (): Command<P> }
-  : { type: string, (value: T): Command<P> }
+export interface AnyCommandCreator {
+  type: string
+  (...value: any[]): Command
+}
 
-export type AnyCommandCreator<P> = CommandCreator<P, any>
+export interface EmptyCommandCreator {
+  type: string
+  (): Command
+}
 
-export function factory(scope: string) {
-  return create
+export interface TypedCommandCreator<T> {
+  type: string
+  (value: T): Command<T>
+}
 
-  function create(type: string): CommandCreator<undefined, void>
-  function create<P>(type: string): CommandCreator<P, P>
-  function create<P>(type: string, mapper: () => P): CommandCreator<P, void>
-  function create<P>(type: string, mapper: () => P, extra?: () => HashMap): CommandCreator<P, void>
-  function create<P, U>(type: string, mapper: () => P, extra?: (value: U) => HashMap): CommandCreator<P, U>
-  function create<P, U>(type: string, mapper: (value: U) => P, extra?: () => HashMap): CommandCreator<P, U>
-  function create<P, U>(type: string, mapper: (value: U) => P, extra?: (value: U) => HashMap): CommandCreator<P, U>
-  function create(type: string, mapper = identity, extra?: (value?: any) => HashMap) {
+export type ComamndCreatorWithMapper<F extends AnyFunction> =
+  & { type: string }
+  & OverwriteRet<F, Command<ReturnType<F>>>
+
+export interface CreatorFactory {
+  (type: string): EmptyCommandCreator
+  <T>(type: string): TypedCommandCreator<T>
+  <F extends AnyFunction>(type: string, mapper: F): ComamndCreatorWithMapper<F>
+}
+
+//
+// ─── IMPL ────────────────────────────────────────────────────────────────────
+//
+function ensureObject(value: any, key: string) {
+  return isObject(value) ? value : { [key]: value }
+}
+
+export function factory(scope: string): CreatorFactory {
+  return (type: string, mapper?: Function) => {
     type = scope + type
-    const f: any = (src: any) => ({ type, payload: mapper(src), ...extra ? extra(src) : {} })
-    f.type = type
-    return f
+    const creator: any = (...value: any[]) => {
+      const body = ensureObject(mapper ? mapper(...value) : value[0], 'payload')
+      return { type, ...body }
+    }
+    creator.type = type
+    return creator
   }
 }
 
 //
 // ─── UTILS ──────────────────────────────────────────────────────────────────────
 //
-export function match<T>(creator: AnyCommandCreator<T>) {
-  return (command: any): command is Command<T> => {
+export function match<T extends AnyCommandCreator>(creator: T) {
+  return (command?: any): command is ReturnType<T> => {
     return command != null && command.type === creator.type
   }
 }
 
-export function isCommand(command: any): command is Command {
+export function isCommand<T>(command: any | T): command is Command<T> {
   return Object(command) === command && typeof command.type === 'string'
 }
