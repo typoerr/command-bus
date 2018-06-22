@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { AnyCommandCreator, AnyCommand } from './command';
+export declare type ReturnTypeByArray<T> = T extends ((...val: any[]) => infer R)[] ? R : never;
 export declare type CommandSourceLike = {
     addEventListener: any;
     removeEventListener: any;
@@ -11,6 +12,6 @@ export declare type CommandSourceLike = {
     off: any;
 };
 export declare type CommandSource = CommandSourceLike | Observable<AnyCommand>;
-export declare type CommandTarget = string | AnyCommandCreator;
-export declare type CommandTargetResult<T> = T extends string ? AnyCommand : T extends AnyCommandCreator ? ReturnType<T> : never;
+export declare type CommandTarget = string | AnyCommandCreator | AnyCommandCreator[];
+export declare type CommandTargetResult<T> = T extends string ? AnyCommand : T extends AnyCommandCreator ? ReturnType<T> : T extends AnyCommandCreator[] ? ReturnTypeByArray<T> : never;
 export declare function select<T extends CommandTarget>(src: CommandSource, target: T): Observable<CommandTargetResult<T>>;

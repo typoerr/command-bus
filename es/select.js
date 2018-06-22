@@ -1,4 +1,4 @@
-import { fromEvent, isObservable } from 'rxjs';
+import { fromEvent, merge, isObservable } from 'rxjs';
 import { map, filter, share } from 'rxjs/operators';
 import { isCommand } from './command';
 function getCommandType(target) {
@@ -11,7 +11,11 @@ function getCommandType(target) {
     return '';
 }
 export function select(src, target) {
-    if (isObservable(src)) {
+    if (Array.isArray(target)) {
+        const srouce = target.map(select.bind(null, src));
+        return merge(...srouce).pipe(share());
+    }
+    else if (isObservable(src)) {
         return src.pipe(filter(command => command.type === getCommandType(target)), share());
     }
     else {

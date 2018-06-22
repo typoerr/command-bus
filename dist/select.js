@@ -13,7 +13,11 @@ function getCommandType(target) {
     return '';
 }
 function select(src, target) {
-    if (rxjs_1.isObservable(src)) {
+    if (Array.isArray(target)) {
+        const srouce = target.map(select.bind(null, src));
+        return rxjs_1.merge(...srouce).pipe(operators_1.share());
+    }
+    else if (rxjs_1.isObservable(src)) {
         return src.pipe(operators_1.filter(command => command.type === getCommandType(target)), operators_1.share());
     }
     else {
