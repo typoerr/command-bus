@@ -2,7 +2,7 @@ import { of } from 'rxjs'
 import { select } from './select'
 import { createCommandBus } from './command-bus'
 import { factory, Command } from './command'
-import { tap, toArray } from 'rxjs/operators'
+import { tap } from 'rxjs/operators'
 
 const create = factory('')
 
@@ -33,13 +33,6 @@ test('select command from action$', () => {
   ).toPromise()
 })
 
-
-test('select commands from action$', async () => {
-  expect.assertions(1)
-  const action$ = of<Command>(ACTION.FOO(1), ACTION.BAR('BAR'), ACTION.BAZ('BAZ'))
-  const commands = await select(action$, [ACTION.BAR, ACTION.BAZ]).pipe(toArray()).toPromise()
-  expect(commands).toEqual([ACTION.BAR('BAR'), ACTION.BAZ('BAZ')])
-})
 
 test('select command from eventname', done => {
   expect.assertions(1)

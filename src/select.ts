@@ -1,16 +1,22 @@
-import { Observable, fromEvent, merge, isObservable } from 'rxjs'
+import { Observable, fromEvent, isObservable } from 'rxjs'
 import { map, filter, share } from 'rxjs/operators'
-import { Command, isCommand, AnyCommandCreator } from './command'
+import { Command, isCommand, AnyCommandCreator, AnyCommand } from './command'
 
-export type EventTargetLike =
+export type CommandSourceLike =
   | { addEventListener: any, removeEventListener: any }
   | { addListener: any, removeListener: any }
   | { on: any, off: any }
 
-export type EventSource<T = any> = EventTargetLike | Observable<Command<T>>
-export type Selectable<T = any> = string | AnyCommandCreator<T> | AnyCommandCreator<T>[]
+export type CommandSource = CommandSourceLike | Observable<AnyCommand>
 
-function getType(target: Selectable) {
+export type CommandTarget = string | AnyCommandCreator
+
+export type CommandTargetResult<T> =
+  T extends string ? AnyCommand :
+  T extends AnyCommandCreator ? ReturnType<T> :
+  never
+
+function getCommandType(target: CommandTarget) {
   if (typeof target === 'string') {
     return target
   } else if ('type' in target) {
@@ -19,16 +25,16 @@ function getType(target: Selectable) {
   return ''
 }
 
-export function select<T>(src: EventSource, target: Selectable<T>): Observable<Command<T>> {
-  const type = getType(target)
-
-  if (Array.isArray(target)) {
-    return merge(...target.map<Observable<Command>>(select.bind(null, src))).pipe(share())
-  } else if (isObservable(src)) {
-    return src.pipe(filter(command => command.type === type), share())
+export function select<T extends CommandTarget>(src: CommandSource, target: T): Observable<CommandTargetResult<T>> {
+  if (isObservable<Command>(src)) {
+    return src.pipe(
+      filter(command => command.type === getCommandType(target)),
+      share(),
+    )
   } else {
-    return fromEvent(src, type).pipe(
-      map(command => isCommand(command) ? command : { type, payload: command }),
+    return fromEvent(src as CommandSourceLike, getCommandType(target)).pipe(
+      // ensure command shape
+      map(command => isCommand(command) ? command : { type: getCommandType(target), payload: command }),
       share(),
     )
   }
