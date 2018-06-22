@@ -1,7 +1,15 @@
-import { Command, AnyCommandCreator } from './command'
+import { AnyCommandCreator, AnyCommand } from './command'
 
-export type BusTarget<T = any> = typeof WILDCARD | symbol | string | AnyCommandCreator<T>
-export type CommandListener<T = any> = (commad: Command<T>) => any
+export type BusTarget = symbol | string | AnyCommandCreator
+
+export interface CommandListener {
+  (command: AnyCommand): void
+}
+
+export interface CommandCreatorListener<T extends AnyCommandCreator> {
+  (command: ReturnType<T>): void
+}
+
 export type CommandBus = ReturnType<typeof createCommandBus>
 
 export const WILDCARD = '*'
@@ -17,10 +25,10 @@ function getEventName(target: BusTarget) {
 }
 
 export function createCommandBus() {
-  const eventMap = new Map<string | symbol, Set<CommandListener>>()
-  const allListeners = new Set<CommandListener>()
+  const eventMap = new Map<string | symbol, Set<Function>>()
+  const allListeners = new Set<Function>()
 
-  function dispatch(command: Command) {
+  function dispatch<T extends AnyCommand>(command: T): T {
     for (const listener of eventMap.get(command.type) || []) {
       listener(command)
     }
@@ -30,14 +38,18 @@ export function createCommandBus() {
     return command
   }
 
-  function on<T = any>(target: BusTarget<T>, listener: CommandListener<T>) {
+  function on<T extends string | symbol>(target: T, listener: CommandListener): CommandListener
+  function on<T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>
+  function on(target: BusTarget, listener: Function) {
     const type = getEventName(target)
     const listeners = isWildcard(type) ? allListeners : eventMap.get(type)
     listeners ? listeners.add(listener) : eventMap.set(type, new Set([listener]))
     return listener
   }
 
-  function off(target: BusTarget, listener: CommandListener) {
+  function off<T extends string | symbol>(target: T, listener: CommandListener): CommandListener
+  function off<T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>
+  function off<T extends BusTarget>(target: T, listener: Function) {
     const type = getEventName(target)
     const listeners = isWildcard(type) ? allListeners : eventMap.get(type)
     listeners && listeners.delete(listener)
