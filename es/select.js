@@ -1,7 +1,7 @@
-import { fromEvent, merge, isObservable } from 'rxjs';
+import { fromEvent, isObservable } from 'rxjs';
 import { map, filter, share } from 'rxjs/operators';
 import { isCommand } from './command';
-function getType(target) {
+function getCommandType(target) {
     if (typeof target === 'string') {
         return target;
     }
@@ -11,15 +11,13 @@ function getType(target) {
     return '';
 }
 export function select(src, target) {
-    const type = getType(target);
-    if (Array.isArray(target)) {
-        return merge(...target.map(select.bind(null, src))).pipe(share());
-    }
-    else if (isObservable(src)) {
-        return src.pipe(filter(command => command.type === type), share());
+    if (isObservable(src)) {
+        return src.pipe(filter(command => command.type === getCommandType(target)), share());
     }
     else {
-        return fromEvent(src, type).pipe(map(command => isCommand(command) ? command : { type, payload: command }), share());
+        return fromEvent(src, getCommandType(target)).pipe(
+        // ensure command shape
+        map(command => isCommand(command) ? command : { type: getCommandType(target), payload: command }), share());
     }
 }
 //# sourceMappingURL=select.js.map

@@ -1,15 +1,38 @@
-import { Command, AnyCommandCreator } from './command';
-export declare type BusTarget<T = any> = typeof WILDCARD | symbol | string | AnyCommandCreator<T>;
-export declare type CommandListener<T = any> = (commad: Command<T>) => any;
+import { AnyCommandCreator, AnyCommand } from './command';
+export declare type BusTarget = symbol | string | AnyCommandCreator;
+export interface CommandListener {
+    (command: AnyCommand): void;
+}
+export interface CommandCreatorListener<T extends AnyCommandCreator> {
+    (command: ReturnType<T>): void;
+}
 export declare type CommandBus = ReturnType<typeof createCommandBus>;
 export declare const WILDCARD = "*";
 export declare function createCommandBus(): {
-    dispatch: (command: Command<any>) => Command<any>;
-    on: <T = any>(target: BusTarget<T>, listener: CommandListener<T>) => CommandListener<T>;
-    off: (target: BusTarget<any>, listener: CommandListener<any>) => CommandListener<any>;
-    getListeners: (target: BusTarget<any>) => CommandListener<any>[];
-    addEventListener: <T = any>(target: BusTarget<T>, listener: CommandListener<T>) => CommandListener<T>;
-    removeEventListener: (target: BusTarget<any>, listener: CommandListener<any>) => CommandListener<any>;
-    addListener: <T = any>(target: BusTarget<T>, listener: CommandListener<T>) => CommandListener<T>;
-    removeListener: (target: BusTarget<any>, listener: CommandListener<any>) => CommandListener<any>;
+    dispatch: <T extends AnyCommand>(command: T) => T;
+    on: {
+        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
+        <T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+    };
+    off: {
+        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
+        <T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+    };
+    getListeners: (target: BusTarget) => Function[];
+    addEventListener: {
+        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
+        <T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+    };
+    removeEventListener: {
+        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
+        <T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+    };
+    addListener: {
+        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
+        <T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+    };
+    removeListener: {
+        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
+        <T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+    };
 };

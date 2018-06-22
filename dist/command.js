@@ -1,14 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_ts_1 = require("@cotto/utils.ts");
+//
+// ─── IMPL ────────────────────────────────────────────────────────────────────
+//
+function ensureObject(value, key) {
+    return utils_ts_1.isObject(value) ? value : { [key]: value };
+}
 function factory(scope) {
-    return create;
-    function create(type, mapper = utils_ts_1.identity, extra) {
+    return (type, mapper) => {
         type = scope + type;
-        const f = (src) => (Object.assign({ type, payload: mapper(src) }, extra ? extra(src) : {}));
-        f.type = type;
-        return f;
-    }
+        const creator = (...value) => {
+            const body = ensureObject(mapper ? mapper(...value) : value[0], 'payload');
+            return Object.assign({ type }, body);
+        };
+        creator.type = type;
+        return creator;
+    };
 }
 exports.factory = factory;
 //
