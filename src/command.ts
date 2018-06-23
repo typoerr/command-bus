@@ -3,17 +3,13 @@ import { HashMap, isObject } from '@cotto/utils.ts'
 //
 // ─── TYPES ──────────────────────────────────────────────────────────────────────
 //
-// tslint:disable:max-line-length
 export type OverwriteRet<Fn, R> =
-  Fn extends (() => any) ? (() => R) :
-  Fn extends ((a: infer A) => any) ? (a: A) => R :
-  Fn extends ((a: infer A, b: infer B) => any) ? (a: A, b: B) => R :
-  Fn extends ((a: infer A, b: infer B, c: infer C) => any) ? (a: A, b: B, c: C) => R :
+  Fn extends ((a?: infer A, b?: infer B, c?: infer C, d?: infer D) => any) ? (a?: A, b?: B, c?: C, d?: D) => R :
+  Fn extends ((a: infer A, b?: infer B, c?: infer C, d?: infer D) => any) ? (a: A, b?: B, c?: C, d?: D) => R :
+  Fn extends ((a: infer A, b: infer B, c?: infer C, d?: infer D) => any) ? (a: A, b: B, c?: C, d?: D) => R :
+  Fn extends ((a: infer A, b: infer B, c: infer C, d?: infer D) => any) ? (a: A, b: B, c: C, d?: D) => R :
   Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D) => any) ? (a: A, b: B, c: C, d: D) => R :
-  Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D, e: infer E) => any) ? (a: A, b: B, c: C, d: D, e: E) => R :
-  Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D, e: infer E, f: infer F) => any) ? (a: A, b: B, c: C, d: D, e: E, f: F) => R :
   never
-// tslint:enable:max-line-length
 
 interface AnyFunction {
   (...value: any[]): any

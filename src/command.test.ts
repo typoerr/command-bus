@@ -21,11 +21,14 @@ test('command creator with mapper', () => {
   const A = create('A', () => 1)
   const B = create('B', (a: number, b: number) => a + b)
   const C = create('C', (a: number, b: number) => ({ a, b }))
+  const D = create('C', (a: number, b: number = 1) => ({ a, b })) // tslint:disable-line
 
   expect(A()).toEqual({ type: 'TEST/A', payload: 1 })
   expect(A.type).toBe('TEST/A')
   expect(B(1, 2)).toEqual({ type: 'TEST/B', payload: 3 })
   expect(C(1, 2)).toEqual({ type: 'TEST/C', a: 1, b: 2 })
+  expect(D(1, 2)).toEqual({ type: 'TEST/C', a: 1, b: 2 })
+  expect(D(1)).toEqual({ type: 'TEST/C', a: 1, b: 1 })
 })
 
 test('match', () => {
