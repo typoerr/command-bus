@@ -1,5 +1,5 @@
 import { HashMap } from '@cotto/utils.ts';
-export declare type OverwriteRet<Fn, R> = Fn extends (() => any) ? (() => R) : Fn extends ((a: infer A) => any) ? (a: A) => R : Fn extends ((a: infer A, b: infer B) => any) ? (a: A, b: B) => R : Fn extends ((a: infer A, b: infer B, c: infer C) => any) ? (a: A, b: B, c: C) => R : Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D) => any) ? (a: A, b: B, c: C, d: D) => R : Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D, e: infer E) => any) ? (a: A, b: B, c: C, d: D, e: E) => R : Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D, e: infer E, f: infer F) => any) ? (a: A, b: B, c: C, d: D, e: E, f: F) => R : never;
+export declare type OverwriteRet<Fn, R> = Fn extends ((a?: infer A, b?: infer B, c?: infer C, d?: infer D) => any) ? (a?: A, b?: B, c?: C, d?: D) => R : Fn extends ((a: infer A, b?: infer B, c?: infer C, d?: infer D) => any) ? (a: A, b?: B, c?: C, d?: D) => R : Fn extends ((a: infer A, b: infer B, c?: infer C, d?: infer D) => any) ? (a: A, b: B, c?: C, d?: D) => R : Fn extends ((a: infer A, b: infer B, c: infer C, d?: infer D) => any) ? (a: A, b: B, c: C, d?: D) => R : Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D) => any) ? (a: A, b: B, c: C, d: D) => R : never;
 interface AnyFunction {
     (...value: any[]): any;
 }
