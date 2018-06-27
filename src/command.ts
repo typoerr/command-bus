@@ -1,72 +1,33 @@
-import { HashMap, isObject } from '@cotto/utils.ts'
+import { HashMap, identity, constant } from '@cotto/utils.ts'
 
-//
-// ─── TYPES ──────────────────────────────────────────────────────────────────────
-//
-export type OverwriteRet<Fn, R> =
-  Fn extends ((a?: infer A, b?: infer B, c?: infer C, d?: infer D) => any) ? (a?: A, b?: B, c?: C, d?: D) => R :
-  Fn extends ((a: infer A, b?: infer B, c?: infer C, d?: infer D) => any) ? (a: A, b?: B, c?: C, d?: D) => R :
-  Fn extends ((a: infer A, b: infer B, c?: infer C, d?: infer D) => any) ? (a: A, b: B, c?: C, d?: D) => R :
-  Fn extends ((a: infer A, b: infer B, c: infer C, d?: infer D) => any) ? (a: A, b: B, c: C, d?: D) => R :
-  Fn extends ((a: infer A, b: infer B, c: infer C, d: infer D) => any) ? (a: A, b: B, c: C, d: D) => R :
-  never
-
-interface AnyFunction {
-  (...value: any[]): any
-}
-
-export type Command<T = {}> = T extends HashMap
-  ? { type: string } & T
-  : { type: string, payload: T }
-
-export interface AnyCommand {
+export type Command<P = any, E = {}> = E & {
   type: string
-  [key: string]: any
+  payload: P,
 }
 
-export interface AnyCommandCreator {
-  type: string
-  (...value: any[]): Command
-}
+export type CommandCreator<T, P, E = {}> = T extends void
+  ? { type: string, (): Command<P, E> }
+  : { type: string, (value: T): Command<P, E> }
 
-export interface EmptyCommandCreator {
-  type: string
-  (): Command
-}
-
-export interface TypedCommandCreator<T> {
-  type: string
-  (value: T): Command<T>
-}
-
-export type ComamndCreatorWithMapper<F extends AnyFunction> =
-  & { type: string }
-  & OverwriteRet<F, Command<ReturnType<F>>>
+export type AnyCommandCreator<P = any, E = {}> = CommandCreator<any, P, E>
 
 export interface CreatorFactory {
-  (type: string): EmptyCommandCreator
-  <T>(type: string): TypedCommandCreator<T>
-  <F extends AnyFunction>(type: string, mapper: F): ComamndCreatorWithMapper<F>
-}
-
-//
-// ─── IMPL ────────────────────────────────────────────────────────────────────
-//
-function ensureObject(value: any, key: string) {
-  return isObject(value) ? value : { [key]: value }
+  (type: string): CommandCreator<undefined, undefined>
+  <P>(type: string): CommandCreator<P, P>
+  <P, E extends HashMap>(type: string, payload?: () => P, extra?: () => E): CommandCreator<undefined, P, E>
+  <T, P, E extends HashMap>(type: string, payload?: (val: T) => P, extra?: (val: T) => E): CommandCreator<T, P, E>
 }
 
 export function factory(scope: string): CreatorFactory {
-  return (type: string, mapper?: Function) => {
+  return (type: string, payload = identity, extra = constant({})) => {
     type = scope + type
-    const creator: any = (...value: any[]) => {
-      const body = ensureObject(mapper ? mapper(...value) : value[0], 'payload')
-      return { type, ...body }
-    }
+    const creator: any = (val: any) => ({ type, payload: payload(val), ...extra(val) })
     creator.type = type
     return creator
   }
 }
+
+export const create = factory('')
 
 //
 // ─── UTILS ──────────────────────────────────────────────────────────────────────
@@ -77,6 +38,6 @@ export function match<T extends AnyCommandCreator>(creator: T) {
   }
 }
 
-export function isCommand<T>(command: any | T): command is Command<T> {
+export function isCommand<T extends Command>(command: any | T): command is Command<T['payload']> {
   return Object(command) === command && typeof command.type === 'string'
 }

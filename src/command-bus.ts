@@ -1,9 +1,9 @@
-import { AnyCommandCreator, AnyCommand } from './command'
+import { AnyCommandCreator, Command } from './command'
 
 export type BusTarget = symbol | string | AnyCommandCreator
 
 export interface CommandListener {
-  (command: AnyCommand): void
+  (command: Command): void
 }
 
 export interface CommandCreatorListener<T extends AnyCommandCreator> {
@@ -28,7 +28,7 @@ export function createCommandBus() {
   const eventMap = new Map<string | symbol, Set<Function>>()
   const allListeners = new Set<Function>()
 
-  function dispatch<T extends AnyCommand>(command: T): T {
+  function dispatch<T extends Command>(command: T): T {
     for (const listener of eventMap.get(command.type) || []) {
       listener(command)
     }

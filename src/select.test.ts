@@ -1,24 +1,21 @@
 import { of } from 'rxjs'
 import { select } from './select'
 import { createCommandBus } from './command-bus'
-import { factory, Command } from './command'
+import { factory } from './command'
 import { tap, toArray } from 'rxjs/operators'
 
 const create = factory('')
 
 const ACTION = {
-  FOO: create<number>('FOO'),
-  BAR: create<string>('BAR'),
-  BAZ: create<string>('BAZ'),
+  FOO: create('FOO', (i: number) => i),
+  BAR: create('BAR', (s: string) => s),
+  BAZ: create('BAZ', (s: string) => s, s => ({ meta: s })),
 }
-
-const evaluate = (a: Command) => (b: Command) => expect(a).toEqual(b)
 
 test('select command from command-bus', done => {
   const bus = createCommandBus()
-  const action = ACTION.FOO(1)
   const action$ = select(bus, ACTION.FOO).pipe(
-    tap(evaluate(action)),
+    tap(x => expect(x).toEqual(ACTION.FOO(1))),
   )
   action$.subscribe(done.bind(undefined, undefined))
   bus.dispatch(ACTION.FOO(1))
@@ -29,9 +26,10 @@ test('select command from action$', () => {
   expect.assertions(1)
   const action$ = of(ACTION.FOO(1))
   return select(action$, ACTION.FOO).pipe(
-    tap(evaluate(ACTION.FOO(1))),
+    tap(x => expect(x).toEqual(ACTION.FOO(1))),
   ).toPromise()
 })
+
 
 test('select commands from action$', async () => {
   expect.assertions(1)
@@ -45,7 +43,7 @@ test('select command from eventname', done => {
   expect.assertions(1)
   const bus = createCommandBus()
   const action$ = select(bus, ACTION.FOO.type).pipe(
-    tap(evaluate(ACTION.FOO(1))),
+    tap(x => expect(x).toEqual(ACTION.FOO(1))),
   )
 
   action$.subscribe(done.bind(undefined, undefined))

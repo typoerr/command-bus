@@ -11,24 +11,21 @@ test('empty command creator', () => {
 
 test('typed command creator', () => {
   const A = create<number>('A')
-  const B = create<{ amount: number }>('B')
   expect(A(1)).toEqual({ type: 'TEST/A', payload: 1 })
-  expect(B({ amount: 1 })).toEqual({ type: 'TEST/B', amount: 1 })
   expect(A.type).toBe('TEST/A')
 })
 
 test('command creator with mapper', () => {
   const A = create('A', () => 1)
-  const B = create('B', (a: number, b: number) => a + b)
-  const C = create('C', (a: number, b: number) => ({ a, b }))
-  const D = create('C', (a: number, b: number = 1) => ({ a, b })) // tslint:disable-line
+  const B = create('B', (a: number) => a + 1)
+  const C = create('C', (a: number) => a, i => ({ meta: i })) // tslint:disable-line
+  const D = create('D', () => 1, (i: number) => ({ meta: i }))
 
   expect(A()).toEqual({ type: 'TEST/A', payload: 1 })
   expect(A.type).toBe('TEST/A')
-  expect(B(1, 2)).toEqual({ type: 'TEST/B', payload: 3 })
-  expect(C(1, 2)).toEqual({ type: 'TEST/C', a: 1, b: 2 })
-  expect(D(1, 2)).toEqual({ type: 'TEST/C', a: 1, b: 2 })
-  expect(D(1)).toEqual({ type: 'TEST/C', a: 1, b: 1 })
+  expect(B(1)).toEqual({ type: 'TEST/B', payload: 2 })
+  expect(C(1)).toEqual({ type: 'TEST/C', payload: 1, meta: 1 })
+  expect(D(1)).toEqual({ type: 'TEST/D', payload: 1, meta: 1 })
 })
 
 test('match', () => {
