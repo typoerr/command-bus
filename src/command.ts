@@ -1,21 +1,22 @@
 import { HashMap, identity, constant } from '@cotto/utils.ts'
 
-export type Command<P = any, E = {}> = E & {
+export type Command<P = any, E = HashMap> = E & {
   type: string
   payload: P,
 }
 
-export type CommandCreator<T, P, E = {}> = T extends void
+export type CommandCreator<T, P, E = HashMap> = T extends void
   ? { type: string, (): Command<P, E> }
   : { type: string, (value: T): Command<P, E> }
 
-export type AnyCommandCreator<P = any, E = {}> = CommandCreator<any, P, E>
+export type AnyCommandCreator<P = any, E = HashMap> = CommandCreator<any, P, E>
 
 export interface CreatorFactory {
   (type: string): CommandCreator<undefined, undefined>
   <P>(type: string): CommandCreator<P, P>
-  <P, E extends HashMap>(type: string, payload?: () => P, extra?: () => E): CommandCreator<undefined, P, E>
-  <T, P, E extends HashMap>(type: string, payload?: (val: T) => P, extra?: (val: T) => E): CommandCreator<T, P, E>
+  <P, E extends HashMap = HashMap>(type: string, payload?: () => P, extra?: () => E): CommandCreator<undefined, P, E>
+  <T, P, E extends HashMap = HashMap>(type: string, payload?: (val: T) => P, extra?: (val: T) => E)
+    : CommandCreator<T, P, E>
 }
 
 export function factory(scope: string): CreatorFactory {
