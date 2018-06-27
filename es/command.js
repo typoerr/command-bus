@@ -1,21 +1,13 @@
-import { isObject } from '@cotto/utils.ts';
-//
-// ─── IMPL ────────────────────────────────────────────────────────────────────
-//
-function ensureObject(value, key) {
-    return isObject(value) ? value : { [key]: value };
-}
+import { identity, constant } from '@cotto/utils.ts';
 export function factory(scope) {
-    return (type, mapper) => {
+    return (type, payload = identity, extra = constant({})) => {
         type = scope + type;
-        const creator = (...value) => {
-            const body = ensureObject(mapper ? mapper(...value) : value[0], 'payload');
-            return Object.assign({ type }, body);
-        };
+        const creator = (val) => (Object.assign({ type, payload: payload(val) }, extra(val)));
         creator.type = type;
         return creator;
     };
 }
+export const create = factory('');
 //
 // ─── UTILS ──────────────────────────────────────────────────────────────────────
 //
