@@ -36,12 +36,12 @@ export function select<T extends CommandTarget>(src: CommandSource, target: T): 
     return src.pipe(
       filter(command => command.type === getCommandType(target)),
       share(),
-    )
+    ) as Observable<CommandTargetResult<T>>
   } else {
     return fromEvent(src as EventTargetLike, getCommandType(target)).pipe(
       // ensure command shape
       map(command => isCommand(command) ? command : { type: getCommandType(target), payload: command }),
       share(),
-    )
+    ) as Observable<CommandTargetResult<T>>
   }
 }
