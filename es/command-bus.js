@@ -1,51 +1,41 @@
+import { Observable } from 'rxjs';
 export const WILDCARD = '*';
-function isWildcard(type) {
-    return type === WILDCARD;
-}
 function getEventName(target) {
     return (typeof target === 'string' || typeof target === 'symbol')
         ? target
         : target.type;
 }
-export function createCommandBus() {
-    const eventMap = new Map();
-    const allListeners = new Set();
-    function dispatch(command) {
-        for (const listener of eventMap.get(command.type) || []) {
-            listener(command);
-        }
-        for (const listener of allListeners) {
-            listener(command);
-        }
-        return command;
+export class CommandBus extends Observable {
+    constructor() {
+        super(observer => this.on('*', observer.next.bind(observer)));
+        /* alias */
+        this.addEventListener = this.on;
+        this.removeEventListener = this.off;
+        this.addListener = this.on;
+        this.removeListener = this.off;
+        this._listeners = new Map();
     }
-    function on(target, listener) {
+    on(target, listener) {
         const type = getEventName(target);
-        const listeners = isWildcard(type) ? allListeners : eventMap.get(type);
-        listeners ? listeners.add(listener) : eventMap.set(type, new Set([listener]));
+        const listeners = this._listeners.get(type);
+        listeners ? listeners.add(listener) : this._listeners.set(type, new Set([listener]));
         return listener;
     }
-    function off(target, listener) {
+    off(target, listener) {
         const type = getEventName(target);
-        const listeners = isWildcard(type) ? allListeners : eventMap.get(type);
+        const listeners = this._listeners.get(type);
         listeners && listeners.delete(listener);
         return listener;
     }
-    function getListeners(target) {
-        const type = getEventName(target);
-        const listeners = isWildcard(type) ? allListeners : eventMap.get(type);
-        return listeners ? Array.from([...listeners]) : [];
+    dispatch(command) {
+        const listeners = [...this._listeners.get(command.type) || [], ...this._listeners.get('*') || []];
+        listeners.forEach(listener => listener(command));
+        return command;
     }
-    return {
-        dispatch,
-        on,
-        off,
-        getListeners,
-        /* alias */
-        addEventListener: on,
-        removeEventListener: off,
-        addListener: on,
-        removeListener: off,
-    };
+    getListeners(target) {
+        const type = getEventName(target);
+        const listeners = this._listeners.get(type);
+        return [...listeners || []];
+    }
 }
 //# sourceMappingURL=command-bus.js.map

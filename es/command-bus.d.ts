@@ -1,4 +1,5 @@
 import { AnyCommandCreator, Command } from './command';
+import { Observable } from 'rxjs';
 export declare type BusTarget = symbol | string | AnyCommandCreator;
 export interface CommandListener {
     (command: Command): void;
@@ -6,19 +7,8 @@ export interface CommandListener {
 export interface CommandCreatorListener<T extends AnyCommandCreator> {
     (command: ReturnType<T>): void;
 }
-export declare type CommandBus = ReturnType<typeof createCommandBus>;
 export declare const WILDCARD = "*";
-export declare function createCommandBus(): {
-    dispatch: <T extends Command<any, import("@cotto/utils.ts/dist/types").HashMap<any>>>(command: T) => T;
-    on: {
-        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, import("@cotto/utils.ts/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
-    };
-    off: {
-        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, import("@cotto/utils.ts/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
-    };
-    getListeners: (target: BusTarget) => Function[];
+export declare class CommandBus extends Observable<Command> {
     addEventListener: {
         <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
         <T extends AnyCommandCreator<any, import("@cotto/utils.ts/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
@@ -35,4 +25,12 @@ export declare function createCommandBus(): {
         <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
         <T extends AnyCommandCreator<any, import("@cotto/utils.ts/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
     };
-};
+    protected _listeners: Map<string | symbol, Set<Function>>;
+    constructor();
+    on<T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
+    on<T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+    off<T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
+    off<T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+    dispatch<T extends Command>(command: T): T;
+    getListeners(target: BusTarget): Function[];
+}
