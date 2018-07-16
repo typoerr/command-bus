@@ -1,67 +1,39 @@
-import { createCommandBus } from './command-bus'
-import { factory } from './command'
-
-const create = factory('')
+import { CommandBus } from './command-bus'
+import { create } from './command'
+import { map } from 'rxjs/operators'
 
 const COMMAND = create<number>('COMMAND')
 
-test('listen/unlisten command by wildcard', () => {
-  expect.assertions(4)
-  const mockA = jest.fn()
-  const mockB = jest.fn()
-  const bus = createCommandBus()
-
-  bus.on('*', mockA)
-  bus.on('*', mockB)
-  expect(bus.getListeners('*')).toEqual([mockA, mockB])
-
+test('on/dispatch/off', () => {
+  expect.assertions(6)
+  const bus = new CommandBus()
+  const l1 = jest.fn()
+  const l2 = jest.fn()
+  /* on */
+  bus.on('*', l1)
+  bus.on(COMMAND, l2)
+  expect(bus.getListeners('*')).toEqual([l1])
+  expect(bus.getListeners(COMMAND)).toEqual([l2])
+  /* dispatch */
   bus.dispatch(COMMAND(1))
-  expect(mockA).toBeCalledWith(COMMAND(1))
-  expect(mockB).toBeCalledWith(COMMAND(1))
-
-  bus.off('*', mockA)
-  expect(bus.getListeners('*')).toEqual([mockB])
+  expect(l1).toBeCalledWith(COMMAND(1))
+  expect(l2).toBeCalledWith(COMMAND(1))
+  /* off */
+  bus.off('*', l1)
+  bus.off(COMMAND, l2)
+  expect(bus.getListeners('*')).toEqual([])
+  expect(bus.getListeners(COMMAND)).toEqual([])
 })
 
-test('listen/unlisten command by command creator', () => {
-  expect.assertions(4)
-  const mockA = jest.fn()
-  const mockB = jest.fn()
-  const bus = createCommandBus()
-
-  bus.on(COMMAND, mockA)
-  bus.on(COMMAND, mockB)
-  expect(bus.getListeners(COMMAND)).toEqual([mockA, mockB])
-
+test('observable interface', () => {
+  expect.assertions(1)
+  const bus = new CommandBus()
+  bus.pipe(map(x => x.payload)).subscribe(value => expect(value).toBe(1))
   bus.dispatch(COMMAND(1))
-  expect(mockA).toBeCalledWith(COMMAND(1))
-  expect(mockB).toBeCalledWith(COMMAND(1))
-
-  bus.off(COMMAND, mockA)
-  expect(bus.getListeners(COMMAND)).toEqual([mockB])
 })
-
-test('listen/unlisten command by string', () => {
-  expect.assertions(4)
-  const mockA = jest.fn()
-  const mockB = jest.fn()
-  const bus = createCommandBus()
-
-  bus.on(COMMAND.type, mockA)
-  bus.on(COMMAND.type, mockB)
-  expect(bus.getListeners(COMMAND.type)).toEqual([mockA, mockB])
-
-  bus.dispatch(COMMAND(1))
-  expect(mockA).toBeCalledWith(COMMAND(1))
-  expect(mockB).toBeCalledWith(COMMAND(1))
-
-  bus.off(COMMAND, mockA)
-  expect(bus.getListeners(COMMAND.type)).toEqual([mockB])
-})
-
 
 test('alias', () => {
-  const bus = createCommandBus()
+  const bus = new CommandBus()
   expect(bus.on).toBe(bus.addEventListener)
   expect(bus.on).toBe(bus.addListener)
   expect(bus.off).toBe(bus.removeEventListener)

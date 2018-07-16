@@ -1,6 +1,6 @@
 import { of } from 'rxjs'
 import { select } from './select'
-import { createCommandBus } from './command-bus'
+import { CommandBus } from './command-bus'
 import { factory } from './command'
 import { tap, toArray } from 'rxjs/operators'
 
@@ -13,7 +13,7 @@ const ACTION = {
 }
 
 test('select command from command-bus', done => {
-  const bus = createCommandBus()
+  const bus = new CommandBus()
   const action$ = select(bus, ACTION.FOO).pipe(
     tap(x => expect(x).toEqual(ACTION.FOO(1))),
   )
@@ -41,7 +41,7 @@ test('select commands from action$', async () => {
 
 test('select command from eventname', done => {
   expect.assertions(1)
-  const bus = createCommandBus()
+  const bus = new CommandBus()
   const action$ = select(bus, ACTION.FOO.type).pipe(
     tap(x => expect(x).toEqual(ACTION.FOO(1))),
   )
