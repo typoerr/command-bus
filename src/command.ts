@@ -1,4 +1,4 @@
-import { HashMap, identity, constant } from '@cotto/utils.ts'
+import { HashMap, identity, constant } from 'f'
 
 export type Command<P = any, E = HashMap> = E & {
   type: string
