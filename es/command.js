@@ -1,4 +1,4 @@
-import { identity, constant } from '@cotto/utils.ts';
+import { identity, constant } from 'f';
 export function factory(scope) {
     return (type, payload = identity, extra = constant({})) => {
         type = scope + type;

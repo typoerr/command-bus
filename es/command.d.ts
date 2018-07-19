@@ -1,4 +1,4 @@
-import { HashMap } from '@cotto/utils.ts';
+import { HashMap } from 'f';
 export declare type Command<P = any, E = HashMap> = E & {
     type: string;
     payload: P;

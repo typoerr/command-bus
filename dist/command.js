@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils_ts_1 = require("@cotto/utils.ts");
+const f_1 = require("f");
 function factory(scope) {
-    return (type, payload = utils_ts_1.identity, extra = utils_ts_1.constant({})) => {
+    return (type, payload = f_1.identity, extra = f_1.constant({})) => {
         type = scope + type;
         const creator = (val) => (Object.assign({ type, payload: payload(val) }, extra(val)));
         creator.type = type;
