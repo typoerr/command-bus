@@ -10,11 +10,13 @@ export interface CommandCreator<T extends any[], P = undefined, E extends HashMa
   (...input: T): Command<P, E>,
 }
 
-export interface AnyCommandCreator<P = any, E = HashMap> extends CommandCreator<[...any[]], P, E> {
+export interface AnyCommandCreator<P = any, E = {}> {
+  type: string
+  (...input: any[]): Command<P, E>
 }
 
 export interface CreatorFactory {
-  (type: string): CommandCreator<[]>
+  (type: string): CommandCreator<[undefined?]>
   <P>(type: string): CommandCreator<[P], P>
   <T extends any[], P, E extends HashMap>(
     type: string,
