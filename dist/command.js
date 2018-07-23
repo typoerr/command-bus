@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const f_1 = require("f");
+const utils_1 = require("utils");
 function factory(scope) {
-    return (type, payload = f_1.identity, extra = f_1.constant({})) => {
+    return (type, pm = utils_1.identity, em = utils_1.constant({})) => {
         type = scope + type;
-        const creator = (val) => (Object.assign({ type, payload: payload(val) }, extra(val)));
+        const creator = (...val) => (Object.assign({ type, payload: pm(...val) }, em(...val)));
         creator.type = type;
         return creator;
     };

@@ -11,19 +11,19 @@ export declare const WILDCARD = "*";
 export declare class CommandBus extends Observable<Command> {
     addEventListener: {
         <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, import("f/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+        <T extends AnyCommandCreator<any, import("utils/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
     };
     removeEventListener: {
         <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, import("f/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+        <T extends AnyCommandCreator<any, import("utils/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
     };
     addListener: {
         <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, import("f/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+        <T extends AnyCommandCreator<any, import("utils/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
     };
     removeListener: {
         <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, import("f/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+        <T extends AnyCommandCreator<any, import("utils/dist/types").HashMap<any>>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
     };
     protected _listeners: Map<string | symbol, Set<Function>>;
     constructor();

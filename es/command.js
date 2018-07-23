@@ -1,8 +1,8 @@
-import { identity, constant } from 'f';
+import { identity, constant } from 'utils';
 export function factory(scope) {
-    return (type, payload = identity, extra = constant({})) => {
+    return (type, pm = identity, em = constant({})) => {
         type = scope + type;
-        const creator = (val) => (Object.assign({ type, payload: payload(val) }, extra(val)));
+        const creator = (...val) => (Object.assign({ type, payload: pm(...val) }, em(...val)));
         creator.type = type;
         return creator;
     };
