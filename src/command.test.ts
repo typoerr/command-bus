@@ -1,31 +1,17 @@
-import { factory, match, isCommand } from './command'
+import { create, match, isCommand } from './command'
 
-const create = factory('TEST/')
+test('create', () => {
+  const a = create('a')
+  const b = create<number>('b')
+  const c = create('c', () => 1)
+  const d = create('d', (i: number) => i, i => ({ input: i }))
+  const e = create('e', (x: number, y: number) => x + y)
 
-test('empty command creator', () => {
-  const A = create('A')
-
-  expect(A()).toEqual({ type: 'TEST/A' })
-  expect(A.type).toBe('TEST/A')
-})
-
-test('typed command creator', () => {
-  const A = create<number>('A')
-  expect(A(1)).toEqual({ type: 'TEST/A', payload: 1 })
-  expect(A.type).toBe('TEST/A')
-})
-
-test('command creator with mapper', () => {
-  const A = create('A', () => 1)
-  const B = create('B', (a: number) => a + 1)
-  const C = create('C', (a: number) => a, i => ({ meta: i })) // tslint:disable-line
-  const D = create('D', () => 1, (i: number) => ({ meta: i }))
-
-  expect(A()).toEqual({ type: 'TEST/A', payload: 1 })
-  expect(A.type).toBe('TEST/A')
-  expect(B(1)).toEqual({ type: 'TEST/B', payload: 2 })
-  expect(C(1)).toEqual({ type: 'TEST/C', payload: 1, meta: 1 })
-  expect(D(1)).toEqual({ type: 'TEST/D', payload: 1, meta: 1 })
+  expect(a()).toStrictEqual({ type: 'a', payload: undefined })
+  expect(b(1)).toStrictEqual({ type: 'b', payload: 1 })
+  expect(c()).toStrictEqual({ type: 'c', payload: 1 })
+  expect(d(1)).toStrictEqual({ type: 'd', payload: 1, input: 1 })
+  expect(e(1, 2)).toStrictEqual({ type: 'e', payload: 3 })
 })
 
 test('match', () => {

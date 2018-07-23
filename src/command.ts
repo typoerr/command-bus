@@ -5,42 +5,28 @@ export type Command<P = any, E = HashMap> = E & {
   payload: P,
 }
 
-export interface EmptyCommandCreator {
-  type: string
-  (): Command<undefined>
+export interface CommandCreator<T extends any[], P = undefined, E extends HashMap = {}> {
+  type: string,
+  (...input: T): Command<P, E>,
 }
 
-export interface TypedCommandCreator<P> {
-  type: string
-  (value: P): Command<P>
-}
-
-export interface ArgLessMappedCommandCreator<P, E> {
-  type: string
-  (): Command<P, E>
-}
-
-export interface MappedCommandCreator<T, P, E> {
-  type: string
-  (value: T): Command<P, E>
-}
-
-export interface AnyCommandCreator<P = any, E = HashMap> {
-  type: string
-  (value?: any): Command<P, E>
+export interface AnyCommandCreator<P = any, E = HashMap> extends CommandCreator<[...any[]], P, E> {
 }
 
 export interface CreatorFactory {
-  (type: string): EmptyCommandCreator
-  <P>(type: string): TypedCommandCreator<P>
-  <P, E extends HashMap>(type: string, payload?: () => P, extra?: () => E): ArgLessMappedCommandCreator<P, E>
-  <T, P, E extends HashMap>(type: string, payload?: (v: T) => P, extra?: (v: T) => E): MappedCommandCreator<T, P, E>
+  (type: string): CommandCreator<[]>
+  <P>(type: string): CommandCreator<[P], P>
+  <T extends any[], P, E extends HashMap>(
+    type: string,
+    payload?: (...v: T) => P,
+    extra?: (...v: T) => E,
+  ): CommandCreator<T, P, E>
 }
 
 export function factory(scope: string): CreatorFactory {
-  return (type: string, payload = identity, extra = constant({})) => {
+  return (type: string, pm = identity as any, em = constant({})) => {
     type = scope + type
-    const creator: any = (val: any) => ({ type, payload: payload(val), ...extra(val) })
+    const creator: any = (...val: any[]) => ({ type, payload: pm(...val), ...em(...val) })
     creator.type = type
     return creator
   }
