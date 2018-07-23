@@ -1,4 +1,4 @@
-import { HashMap, identity, constant } from 'f'
+import { HashMap, identity, constant } from 'utils'
 
 export type Command<P = any, E = HashMap> = E & {
   type: string
