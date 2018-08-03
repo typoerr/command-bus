@@ -5,10 +5,15 @@ export type Command<P = any, E = HashMap> = E & {
   payload: P,
 }
 
-export interface CommandCreator<T extends any[], P = undefined, E extends HashMap = {}> {
+export type CreatorFunc<T, P = undefined, E extends HashMap = {}> =
+  T extends any[] ? (...input: T) => Command<P, E> :
+  T extends void ? (...input: [...any[]]) => Command<P, E> :
+  (...input: [T, ...any[]]) => Command<P, E>
+
+
+export type CommandCreator<T, P = undefined, E extends HashMap = {}> = {
   type: string,
-  (...input: T): Command<P, E>,
-}
+} & CreatorFunc<T, P, E>
 
 export interface AnyCommandCreator<P = any, E = {}> {
   type: string
@@ -16,8 +21,8 @@ export interface AnyCommandCreator<P = any, E = {}> {
 }
 
 export interface CreatorFactory {
-  (type: string): CommandCreator<[undefined?]>
-  <P>(type: string): CommandCreator<[P], P>
+  (type: string): CommandCreator<undefined>
+  <P>(type: string): CommandCreator<P, P>
   <T extends any[], P, E extends HashMap>(
     type: string,
     payload?: (...v: T) => P,
