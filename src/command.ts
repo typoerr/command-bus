@@ -1,13 +1,17 @@
-import { HashMap, identity, constant } from 'utils'
+import { HashMap, identity, constant } from 'utls'
 
 export type Command<P = any, E = HashMap> = E & {
   type: string
-  payload: P,
+  payload: P
 }
 
-export interface CommandCreator<T extends any[], P = undefined, E extends HashMap = {}> {
-  type: string,
-  (...input: T): Command<P, E>,
+export interface CommandCreator<
+  T extends any[],
+  P = undefined,
+  E extends HashMap = {}
+> {
+  type: string
+  (...input: T): Command<P, E>
 }
 
 export interface AnyCommandCreator<P = any, E = {}> {
@@ -28,7 +32,11 @@ export interface CreatorFactory {
 export function factory(scope: string): CreatorFactory {
   return (type: string, pm = identity as any, em = constant({})) => {
     type = scope + type
-    const creator: any = (...val: any[]) => ({ type, payload: pm(...val), ...em(...val) })
+    const creator: any = (...val: any[]) => ({
+      type,
+      payload: pm(...val),
+      ...em(...val),
+    })
     creator.type = type
     return creator
   }
@@ -45,6 +53,8 @@ export function match<T extends AnyCommandCreator>(creator: T) {
   }
 }
 
-export function isCommand<T extends Command>(command: any | T): command is Command<T['payload']> {
+export function isCommand<T extends Command>(
+  command: any | T,
+): command is Command<T['payload']> {
   return Object(command) === command && typeof command.type === 'string'
 }
