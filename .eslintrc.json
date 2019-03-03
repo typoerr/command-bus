@@ -1,0 +1,10 @@
+{
+  "extends": [
+    "eslint-config-nullabletypo",
+    "eslint-config-nullabletypo/+typescript"
+  ],
+  "rules": {
+    "no-dupe-class-members": "off",
+    "@typescript-eslint/no-use-before-define": "off"
+  }
+}
