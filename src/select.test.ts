@@ -9,10 +9,14 @@ const create = factory('')
 const ACTION = {
   FOO: create('FOO', (i: number) => i),
   BAR: create('BAR', (s: string) => s),
-  BAZ: create('BAZ', (s: string) => s, s => ({ meta: s })),
+  BAZ: create('BAZ', {
+    payload: (s: string) => s,
+    meta: s => ({ input: s }),
+  }),
 }
 
 test('select command from command-bus', done => {
+  expect.assertions(1)
   const bus = new CommandBus()
   const action$ = select(bus, ACTION.FOO).pipe(
     tap(x => expect(x).toEqual(ACTION.FOO(1))),
@@ -32,7 +36,8 @@ test('select command from action$', () => {
 test('select commands from action$', async () => {
   expect.assertions(1)
   const action$ = of(ACTION.FOO(1), ACTION.BAR('BAR'), ACTION.BAZ('BAZ'))
-  const commands = await select(action$, [ACTION.BAR, ACTION.BAZ])
+  const commands = await select
+    .each(action$, [ACTION.BAR, ACTION.BAZ])
     .pipe(toArray())
     .toPromise()
   expect(commands).toEqual([ACTION.BAR('BAR'), ACTION.BAZ('BAZ')])

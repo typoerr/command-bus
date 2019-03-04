@@ -1,29 +1,26 @@
-import { Observable, fromEvent, merge, isObservable } from 'rxjs'
-import { map, filter, share } from 'rxjs/operators'
-import { Command, isCommand, AnyCommandCreator } from './command'
+import { Observable, fromEvent, merge } from 'rxjs'
+import { map, share, filter } from 'rxjs/operators'
 
-export type ReturnTypeByArray<T> = T extends ((...val: any[]) => infer R)[]
+export type EachReturnType<T> = T extends ((...val: any[]) => infer R)[]
   ? R
   : never
 
-export type EventEmitterLike =
+export type EELike =
   | { addEventListener: any; removeEventListener: any }
   | { addListener: any; removeListener: any }
   | { on: any; off: any }
 
-export type CommandSource = EventEmitterLike | Observable<Command>
+export interface AbsCommand<T = any> {
+  type: string
+  payload: T
+}
 
-export type CommandTarget = string | AnyCommandCreator | AnyCommandCreator[]
+export interface AbsCommandCreator<T extends AbsCommand = AbsCommand> {
+  type: string
+  (...args: any[]): T
+}
 
-export type CommandTargetResult<T> = T extends string
-  ? Command
-  : T extends AnyCommandCreator
-  ? ReturnType<T>
-  : T extends AnyCommandCreator[]
-  ? ReturnTypeByArray<T>
-  : never
-
-const isEventEmitterLike = (src: any): src is EventEmitterLike => {
+function isEELike(src: any): src is EELike {
   if ('addEventListener' in src && 'removeEventListener' in src) {
     return true
   } else if ('addListener' in src && 'removeListener' in src) {
@@ -35,7 +32,7 @@ const isEventEmitterLike = (src: any): src is EventEmitterLike => {
   }
 }
 
-export function getCommandType(target: CommandTarget) {
+function getType(target: string | { type: string }) {
   if (typeof target === 'string') {
     return target
   } else if ('type' in target) {
@@ -44,46 +41,78 @@ export function getCommandType(target: CommandTarget) {
   return ''
 }
 
-const fromArray = <T extends AnyCommandCreator>(
-  src: CommandSource,
-  target: T[],
-): Observable<CommandTargetResult<T>> => {
-  const srouce: Observable<Command>[] = target.map(select.bind(undefined, src))
-  return merge(...srouce).pipe(share())
+function isCommand(command: any): command is AbsCommand<any> {
+  return typeof command === 'object' && command != null && 'type' in command
 }
 
-const fromBus = <T extends CommandTarget>(src: EventEmitterLike, target: T) => {
-  return fromEvent(src, getCommandType(target)).pipe(
-    map(command =>
-      isCommand(command)
-        ? command
-        : { type: getCommandType(target), payload: command },
-    ),
-    share(),
-  ) as Observable<CommandTargetResult<T>>
-}
-
-const fromObservable = <T extends CommandTarget>(
-  src: Observable<Command>,
+/**
+ * select a event from EventEmitterLike
+ */
+function fromEELike(src: EELike, target: string): Observable<AbsCommand<any>>
+function fromEELike<T extends AbsCommandCreator>(
+  src: EELike,
   target: T,
-) => {
-  return src.pipe(
-    filter(command => command.type === getCommandType(target)),
+): Observable<AbsCommand<ReturnType<T>>>
+function fromEELike(
+  src: EELike,
+  target: string | AbsCommandCreator,
+): Observable<AbsCommand<any>> {
+  const type = getType(target)
+  const ensure = (payload: any) =>
+    isCommand(payload) ? payload : { type, payload }
+
+  return fromEvent(src, type).pipe(
+    map(ensure),
     share(),
-  ) as Observable<CommandTargetResult<T>>
+  )
 }
 
-export function select<T extends CommandTarget>(
-  src: CommandSource,
+/**
+ * Select a event from Observable<Command>
+ */
+function fromObservable<T extends AbsCommandCreator>(
+  src$: Observable<AbsCommand>,
   target: T,
-): Observable<CommandTargetResult<T>> {
-  if (Array.isArray(target)) {
-    return fromArray(src, target)
-  } else if (isEventEmitterLike(src)) {
-    return fromBus(src, target)
-  } else if (isObservable<Command>(src)) {
-    return fromObservable(src, target)
-  } else {
-    return fromBus(src, target)
+) {
+  return src$.pipe(
+    filter((cmd: AbsCommand) => cmd.type === target.type),
+    share(),
+  )
+}
+
+/**
+ * Select a command from StreamLike
+ */
+function select(src: EELike, target: string): Observable<AbsCommand<any>>
+function select<T extends AbsCommandCreator>(
+  source: EELike,
+  target: T,
+): Observable<ReturnType<T>>
+function select<T extends AbsCommandCreator>(
+  source: Observable<AbsCommand>,
+  target: T,
+): Observable<ReturnType<T>>
+function select(src: any, target: any) {
+  if (isEELike(src)) {
+    return fromEELike(src, target)
   }
+  return fromObservable(src, target)
 }
+
+function each(src: EELike, target: string[]): Observable<AbsCommand<any>>
+function each<T extends AbsCommandCreator>(
+  src: EELike,
+  target: T[],
+): Observable<EachReturnType<T[]>>
+function each<T extends AbsCommandCreator>(
+  src: Observable<AbsCommand>,
+  target: T[],
+): Observable<EachReturnType<T[]>>
+function each(src: any, target: any[]) {
+  const obs = target.map(select.bind(undefined, src))
+  return merge(...obs).pipe(share())
+}
+
+select.each = each
+
+export { select }
