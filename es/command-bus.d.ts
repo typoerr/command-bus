@@ -1,36 +1,42 @@
-import { AnyCommandCreator, Command } from './command';
 import { Observable } from 'rxjs';
-export declare type BusTarget = symbol | string | AnyCommandCreator;
-export interface CommandListener {
-    (command: Command): void;
+interface Command {
+    type: string;
+    payload: unknown;
+    [key: string]: any;
 }
-export interface CommandCreatorListener<T extends AnyCommandCreator> {
-    (command: ReturnType<T>): void;
+interface CommandCreator {
+    type: string;
+    (...val: any[]): any;
 }
-export declare const WILDCARD = "*";
+declare type ListenerType = string | symbol | {
+    type: string;
+};
 export declare class CommandBus extends Observable<Command> {
+    static WILDCARD: string;
+    static getType(type: ListenerType): any;
+    on: {
+        <T extends CommandCreator>(type: T, handler: (val: Parameters<T>) => void): Function;
+        (type: ListenerType, handler: Function): Function;
+    };
+    off: {
+        <T extends CommandCreator>(type: T, handler: (val: Parameters<T>) => void): Function;
+        (type: ListenerType, handler: Function): Function;
+    };
     addEventListener: {
-        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, {}>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+        <T extends CommandCreator>(type: T, handler: (val: Parameters<T>) => void): Function;
+        (type: ListenerType, handler: Function): Function;
     };
     removeEventListener: {
-        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, {}>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+        <T extends CommandCreator>(type: T, handler: (val: Parameters<T>) => void): Function;
+        (type: ListenerType, handler: Function): Function;
     };
-    addListener: {
-        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, {}>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
-    };
-    removeListener: {
-        <T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-        <T extends AnyCommandCreator<any, {}>>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
-    };
-    protected _listeners: Map<string | symbol, Set<Function>>;
+    protected registory: Map<string | symbol, Set<Function>>;
     constructor();
-    on<T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-    on<T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
-    off<T extends string | symbol>(target: T, listener: CommandListener): CommandListener;
-    off<T extends AnyCommandCreator>(target: T, listener: CommandCreatorListener<T>): CommandCreatorListener<T>;
+    addListener<T extends CommandCreator>(type: T, handler: (val: Parameters<T>) => void): Function;
+    addListener(type: ListenerType, handler: Function): Function;
+    removeListener<T extends CommandCreator>(type: T, handler: (val: Parameters<T>) => void): Function;
+    removeListener(type: ListenerType, handler: Function): Function;
     dispatch<T extends Command>(command: T): T;
-    getListeners(target: BusTarget): Function[];
+    getListeners(type: ListenerType): Set<Function> | undefined;
 }
+export {};

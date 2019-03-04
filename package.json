@@ -1,7 +1,7 @@
 {
   "name": "command-bus",
   "description": "command-bus",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "author": "nullabletypo",
   "files": [
     "es",

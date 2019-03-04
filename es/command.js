@@ -1,16 +1,37 @@
-import { identity, constant } from 'utils';
+import { identity, constant } from '@nullabletypo/utils-js';
+function fromMapper(scope, type, mapper) {
+    type = scope + type;
+    const create = (...args) => {
+        const payload = (mapper || identity)(...args);
+        return { type, payload, meta: undefined };
+    };
+    create.type = type;
+    return create;
+}
+function fromMaperSet(scope, type, mappers) {
+    type = scope + type;
+    const create = (...args) => {
+        const payload = mappers.payload(...args);
+        const meta = (mappers.meta || constant(undefined))(...args);
+        return { type, payload, meta };
+    };
+    create.type = type;
+    return create;
+}
 export function factory(scope) {
-    return (type, pm = identity, em = constant({})) => {
-        type = scope + type;
-        const creator = (...val) => (Object.assign({ type, payload: pm(...val) }, em(...val)));
-        creator.type = type;
-        return creator;
+    return function creator(type, mapper) {
+        if (typeof mapper === 'function') {
+            return fromMapper(scope, type, mapper);
+        }
+        else if (typeof mapper === 'object') {
+            return fromMaperSet(scope, type, mapper);
+        }
+        else {
+            return fromMapper(scope, type);
+        }
     };
 }
 export const create = factory('');
-//
-// ─── UTILS ──────────────────────────────────────────────────────────────────────
-//
 export function match(creator) {
     return (command) => {
         return command != null && command.type === creator.type;

@@ -1,22 +1,25 @@
-import { HashMap } from 'utils';
-export declare type Command<P = any, E = HashMap> = E & {
+import { AnyFunction } from '@nullabletypo/utils-js';
+export declare type Command<P, M = undefined> = {
     type: string;
     payload: P;
+    meta: M;
 };
-export interface CommandCreator<T extends any[], P = undefined, E extends HashMap = {}> {
+export interface CommandCreator<T extends any[], P, M = undefined> {
     type: string;
-    (...input: T): Command<P, E>;
+    (...args: T): Command<P, M>;
 }
-export interface AnyCommandCreator<P = any, E = {}> {
-    type: string;
-    (...input: any[]): Command<P, E>;
+interface MapperSet<T extends any[], R1, R2> {
+    payload: (...val: T) => R1;
+    meta?: (...val: T) => R2;
 }
-export interface CreatorFactory {
-    (type: string): CommandCreator<[undefined?]>;
+export interface CommandCreatorFactoryResult {
+    (type: string): CommandCreator<[undefined?], undefined>;
     <P>(type: string): CommandCreator<[P], P>;
-    <T extends any[], P, E extends HashMap>(type: string, payload?: (...v: T) => P, extra?: (...v: T) => E): CommandCreator<T, P, E>;
+    <T extends AnyFunction>(type: string, mapper?: T): CommandCreator<Parameters<T>, ReturnType<T>>;
+    <T extends any[], P, M>(type: string, mappers?: MapperSet<T, P, M>): CommandCreator<T, P, M>;
 }
-export declare function factory(scope: string): CreatorFactory;
-export declare const create: CreatorFactory;
-export declare function match<T extends AnyCommandCreator>(creator: T): (command?: any) => command is ReturnType<T>;
-export declare function isCommand<T extends Command>(command: any | T): command is Command<T['payload']>;
+export declare function factory(scope: string): CommandCreatorFactoryResult;
+export declare const create: CommandCreatorFactoryResult;
+export declare function match<T extends CommandCreator<any, any>>(creator: T): (command?: any) => command is ReturnType<T>;
+export declare function isCommand<T extends Command<any, any>>(command: any | T): command is T;
+export {};
