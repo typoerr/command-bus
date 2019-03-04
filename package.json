@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/nullabletypo/command-bus",
   "dependencies": {
-    "rxjs": "^6.4.0",
-    "utls": "https://github.com/nullabletypo/utls"
+    "@nullabletypo/utils-js": "https://github.com/nullabletypo/utils-js",
+    "rxjs": "^6.4.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.9",

@@ -1,81 +1,77 @@
-import { AnyCommandCreator, Command } from './command'
 import { Observable } from 'rxjs'
 
-export type BusTarget = symbol | string | AnyCommandCreator
-
-export interface CommandListener {
-  (command: Command): void
+interface Command {
+  type: string
+  payload: unknown
+  [key: string]: any
 }
 
-export interface CommandCreatorListener<T extends AnyCommandCreator> {
-  (command: ReturnType<T>): void
+interface CommandCreator {
+  type: string
+  (...val: any[]): any
 }
 
-export const WILDCARD = '*'
-
-function getEventName(target: BusTarget) {
-  return typeof target === 'string' || typeof target === 'symbol'
-    ? target
-    : target.type
-}
+type ListenerType = string | symbol | { type: string }
 
 export class CommandBus extends Observable<Command> {
-  /* alias */
-  addEventListener = this.on
-  removeEventListener = this.off
-  addListener = this.on
-  removeListener = this.off
+  static WILDCARD = '*'
 
-  protected _listeners = new Map<string | symbol, Set<Function>>()
+  static getType(type: ListenerType) {
+    return Object(type) === type ? (type as any).type : type
+  }
+
+  /* alias */
+  on = this.addListener
+  off = this.removeListener
+  addEventListener = this.addListener
+  removeEventListener = this.removeListener
+
+  protected registory = new Map<string | symbol, Set<Function>>()
 
   constructor() {
-    super(observer => this.on('*', observer.next.bind(observer)))
+    super(observer =>
+      this.on(CommandBus.WILDCARD, observer.next.bind(observer)),
+    )
   }
 
-  on<T extends string | symbol>(
-    target: T,
-    listener: CommandListener,
-  ): CommandListener
-  on<T extends AnyCommandCreator>(
-    target: T,
-    listener: CommandCreatorListener<T>,
-  ): CommandCreatorListener<T>
-  on(target: BusTarget, listener: Function) {
-    const type = getEventName(target)
-    const listeners = this._listeners.get(type)
-    listeners
-      ? listeners.add(listener)
-      : this._listeners.set(type, new Set([listener]))
-    return listener
+  addListener<T extends CommandCreator>(
+    type: T,
+    handler: (val: Parameters<T>) => void,
+  ): Function
+  addListener(type: ListenerType, handler: Function): Function
+  addListener(type: ListenerType, handler: Function) {
+    const listeners = this.getListeners(type)
+    if (listeners) {
+      listeners.add(handler)
+    } else {
+      this.registory.set(CommandBus.getType(type), new Set([handler]))
+    }
+    return handler
   }
 
-  off<T extends string | symbol>(
-    target: T,
-    listener: CommandListener,
-  ): CommandListener
-  off<T extends AnyCommandCreator>(
-    target: T,
-    listener: CommandCreatorListener<T>,
-  ): CommandCreatorListener<T>
-  off<T extends BusTarget>(target: T, listener: Function) {
-    const type = getEventName(target)
-    const listeners = this._listeners.get(type)
-    listeners && listeners.delete(listener)
-    return listener
+  removeListener<T extends CommandCreator>(
+    type: T,
+    handler: (val: Parameters<T>) => void,
+  ): Function
+  removeListener(type: ListenerType, handler: Function): Function
+  removeListener(type: ListenerType, handler: Function) {
+    const listeners = this.getListeners(type)
+    if (listeners) {
+      listeners.delete(handler)
+    }
+    return handler
   }
 
-  dispatch<T extends Command>(command: T): T {
+  dispatch<T extends Command>(command: T) {
     const listeners = [
-      ...(this._listeners.get(command.type) || []),
-      ...(this._listeners.get('*') || []),
+      ...(this.getListeners(command) || []),
+      ...(this.getListeners(CommandBus.WILDCARD) || []),
     ]
-    listeners.forEach(listener => listener(command))
+    listeners.forEach(fn => fn(command))
     return command
   }
 
-  getListeners(target: BusTarget) {
-    const type = getEventName(target)
-    const listeners = this._listeners.get(type)
-    return [...(listeners || [])]
+  getListeners(type: ListenerType) {
+    return this.registory.get(CommandBus.getType(type))
   }
 }

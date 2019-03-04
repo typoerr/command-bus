@@ -131,6 +131,10 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@nullabletypo/utils-js@https://github.com/nullabletypo/utils-js":
+  version "0.0.14"
+  resolved "https://github.com/nullabletypo/utils-js#854862bbd4a4e343e2d3bdc899fe51eeaa2e7f13"
+
 "@types/jest-diff@*":
   version "20.0.1"
   resolved "https://registry.yarnpkg.com/@types/jest-diff/-/jest-diff-20.0.1.tgz#35cc15b9c4f30a18ef21852e255fdb02f6d59b89"
@@ -3771,10 +3775,6 @@ util.promisify@^1.0.0:
   dependencies:
     define-properties "^1.1.2"
     object.getownpropertydescriptors "^2.0.3"
-
-"utls@https://github.com/nullabletypo/utls":
-  version "0.0.11"
-  resolved "https://github.com/nullabletypo/utls#4835066249ce2bd7ccd918d5e90a396dc78eb637"
 
 uuid@^3.3.2:
   version "3.3.2"
