@@ -1,60 +1,84 @@
-import { HashMap, identity, constant } from 'utls'
+import { identity, AnyFunction, constant } from '@nullabletypo/utils-js'
 
-export type Command<P = any, E = HashMap> = E & {
+export type Command<P, M = undefined> = {
   type: string
   payload: P
+  meta: M
 }
 
-export interface CommandCreator<
-  T extends any[],
-  P = undefined,
-  E extends HashMap = {}
-> {
+export interface CommandCreator<T extends any[], P, M = undefined> {
   type: string
-  (...input: T): Command<P, E>
+  (...args: T): Command<P, M>
 }
 
-export interface AnyCommandCreator<P = any, E = {}> {
-  type: string
-  (...input: any[]): Command<P, E>
+interface MapperSet<T extends any[], R1, R2> {
+  payload: (...val: T) => R1
+  meta?: (...val: T) => R2
 }
 
-export interface CreatorFactory {
-  (type: string): CommandCreator<[undefined?]>
+export interface CommandCreatorFactoryResult {
+  (type: string): CommandCreator<[undefined?], undefined>
   <P>(type: string): CommandCreator<[P], P>
-  <T extends any[], P, E extends HashMap>(
+  <T extends AnyFunction>(type: string, mapper?: T): CommandCreator<
+    Parameters<T>,
+    ReturnType<T>
+  >
+  <T extends any[], P, M>(
     type: string,
-    payload?: (...v: T) => P,
-    extra?: (...v: T) => E,
-  ): CommandCreator<T, P, E>
+    mappers?: MapperSet<T, P, M>,
+  ): CommandCreator<T, P, M>
 }
 
-export function factory(scope: string): CreatorFactory {
-  return (type: string, pm = identity as any, em = constant({})) => {
-    type = scope + type
-    const creator: any = (...val: any[]) => ({
-      type,
-      payload: pm(...val),
-      ...em(...val),
-    })
-    creator.type = type
-    return creator
+function fromMapper(scope: string, type: string, mapper?: Function) {
+  type = scope + type
+  const create = (...args: any[]) => {
+    const payload = (mapper || identity)(...args)
+    return { type, payload, meta: undefined }
+  }
+  create.type = type
+  return create
+}
+
+function fromMaperSet(
+  scope: string,
+  type: string,
+  mappers: MapperSet<any, any, any>,
+) {
+  type = scope + type
+  const create = (...args: any[]) => {
+    const payload = mappers.payload(...args)
+    const meta = (mappers.meta || constant(undefined))(...args)
+    return { type, payload, meta }
+  }
+  create.type = type
+  return create
+}
+
+export function factory(scope: string): CommandCreatorFactoryResult {
+  return function creator(
+    type: string,
+    mapper?: AnyFunction | MapperSet<any, any, any>,
+  ) {
+    if (typeof mapper === 'function') {
+      return fromMapper(scope, type, mapper)
+    } else if (typeof mapper === 'object') {
+      return fromMaperSet(scope, type, mapper)
+    } else {
+      return fromMapper(scope, type)
+    }
   }
 }
 
 export const create = factory('')
 
-//
-// ─── UTILS ──────────────────────────────────────────────────────────────────────
-//
-export function match<T extends AnyCommandCreator>(creator: T) {
+export function match<T extends CommandCreator<any, any>>(creator: T) {
   return (command?: any): command is ReturnType<T> => {
     return command != null && command.type === creator.type
   }
 }
 
-export function isCommand<T extends Command>(
+export function isCommand<T extends Command<any, any>>(
   command: any | T,
-): command is Command<T['payload']> {
+): command is T {
   return Object(command) === command && typeof command.type === 'string'
 }
