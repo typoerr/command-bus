@@ -1,5 +1,5 @@
-import { CommandBus } from './command-bus'
-import { create } from './command'
+import { CommandBus } from '../src/command-bus'
+import { create } from '../src/command'
 import { map } from 'rxjs/operators'
 
 const COMMAND = create<number>('COMMAND')

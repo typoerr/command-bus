@@ -1,7 +1,7 @@
 import { of } from 'rxjs'
-import { select } from './select'
-import { CommandBus } from './command-bus'
-import { factory } from './command'
+import { select } from '../src/select'
+import { CommandBus } from '../src/command-bus'
+import { factory } from '../src/command'
 import { tap, toArray } from 'rxjs/operators'
 
 const create = factory('')

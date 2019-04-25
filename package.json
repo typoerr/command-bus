@@ -51,6 +51,15 @@
     "lint": "tslint src/**/*.ts",
     "release:github": "git add . && git commit -am $npm_package_version --allow-empty && git tag $npm_package_version && git push && git push --tags",
     "release": "run-s clean compile test release:github",
-    "test": "NODE_ENV=test jest"
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "verbose": true,
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "test/tsconfig.json"
+      }
+    }
   }
 }

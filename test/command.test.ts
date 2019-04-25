@@ -1,4 +1,4 @@
-import { create, match, isCommand } from './command'
+import { create, match, isCommand } from '../src/command'
 
 test('create', () => {
   const a = create('a')
