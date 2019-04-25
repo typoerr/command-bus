@@ -11,7 +11,7 @@ export interface CommandCreator<T extends any[], P, M = undefined> {
   (...args: T): Command<P, M>
 }
 
-interface MapperSet<T extends any[], R1, R2> {
+interface WithMetaMapper<T extends any[], R1, R2> {
   payload: (...val: T) => R1
   meta?: (...val: T) => R2
 }
@@ -19,14 +19,8 @@ interface MapperSet<T extends any[], R1, R2> {
 export interface CommandCreatorFactoryResult {
   (type: string): CommandCreator<[undefined?], undefined>
   <P>(type: string): CommandCreator<[P], P>
-  <T extends AnyFunc>(type: string, mapper?: T): CommandCreator<
-    Parameters<T>,
-    ReturnType<T>
-  >
-  <T extends any[], P, M>(
-    type: string,
-    mappers?: MapperSet<T, P, M>,
-  ): CommandCreator<T, P, M>
+  <T extends AnyFunc>(type: string, mapper?: T): CommandCreator<Parameters<T>, ReturnType<T>>
+  <T extends any[], P, M>(type: string, mappers?: WithMetaMapper<T, P, M>): CommandCreator<T, P, M>
 }
 
 function fromMapper(scope: string, type: string, mapper?: Function) {
@@ -39,11 +33,7 @@ function fromMapper(scope: string, type: string, mapper?: Function) {
   return create
 }
 
-function fromMaperSet(
-  scope: string,
-  type: string,
-  mappers: MapperSet<any, any, any>,
-) {
+function fromMaperSet(scope: string, type: string, mappers: WithMetaMapper<any, any, any>) {
   type = scope + type
   const create = (...args: any[]) => {
     const payload = mappers.payload(...args)
@@ -55,10 +45,7 @@ function fromMaperSet(
 }
 
 export function factory(scope: string): CommandCreatorFactoryResult {
-  return function creator(
-    type: string,
-    mapper?: AnyFunc | MapperSet<any, any, any>,
-  ) {
+  return function creator(type: string, mapper?: AnyFunc | WithMetaMapper<any, any, any>) {
     if (typeof mapper === 'function') {
       return fromMapper(scope, type, mapper)
     } else if (typeof mapper === 'object') {
@@ -77,8 +64,6 @@ export function match<T extends CommandCreator<any, any>>(creator: T) {
   }
 }
 
-export function isCommand<T extends Command<any, any>>(
-  command: any | T,
-): command is T {
+export function isCommand<T extends Command<any, any>>(command: any | T): command is T {
   return Object(command) === command && typeof command.type === 'string'
 }

@@ -1,9 +1,8 @@
 import { Observable, fromEvent, merge } from 'rxjs'
 import { map, share, filter } from 'rxjs/operators'
+import { isCommand } from './command'
 
-export type EachReturnType<T> = T extends ((...val: any[]) => infer R)[]
-  ? R
-  : never
+export type EachReturnType<T> = T extends ((...val: any[]) => infer R)[] ? R : never
 
 export type EELike =
   | { addEventListener: any; removeEventListener: any }
@@ -41,10 +40,6 @@ function getType(target: string | { type: string }) {
   return ''
 }
 
-function isCommand(command: any): command is AbsCommand<any> {
-  return typeof command === 'object' && command != null && 'type' in command
-}
-
 /**
  * select a event from EventEmitterLike
  */
@@ -53,14 +48,9 @@ function fromEELike<T extends AbsCommandCreator>(
   src: EELike,
   target: T,
 ): Observable<AbsCommand<ReturnType<T>>>
-function fromEELike(
-  src: EELike,
-  target: string | AbsCommandCreator,
-): Observable<AbsCommand<any>> {
+function fromEELike(src: EELike, target: string | AbsCommandCreator): Observable<AbsCommand<any>> {
   const type = getType(target)
-  const ensure = (payload: any) =>
-    isCommand(payload) ? payload : { type, payload }
-
+  const ensure = (payload: any) => (isCommand(payload) ? payload : { type, payload })
   return fromEvent(src, type).pipe(
     map(ensure),
     share(),
@@ -70,10 +60,7 @@ function fromEELike(
 /**
  * Select a event from Observable<Command>
  */
-function fromObservable<T extends AbsCommandCreator>(
-  src$: Observable<AbsCommand>,
-  target: T,
-) {
+function fromObservable<T extends AbsCommandCreator>(src$: Observable<AbsCommand>, target: T) {
   return src$.pipe(
     filter((cmd: AbsCommand) => cmd.type === target.type),
     share(),
@@ -84,10 +71,7 @@ function fromObservable<T extends AbsCommandCreator>(
  * Select a command from StreamLike
  */
 function select(src: EELike, target: string): Observable<AbsCommand<any>>
-function select<T extends AbsCommandCreator>(
-  source: EELike,
-  target: T,
-): Observable<ReturnType<T>>
+function select<T extends AbsCommandCreator>(source: EELike, target: T): Observable<ReturnType<T>>
 function select<T extends AbsCommandCreator>(
   source: Observable<AbsCommand>,
   target: T,

@@ -29,15 +29,10 @@ export class CommandBus extends Observable<Command> {
   protected registory = new Map<string | symbol, Set<Function>>()
 
   constructor() {
-    super(observer =>
-      this.on(CommandBus.WILDCARD, observer.next.bind(observer)),
-    )
+    super(observer => this.on(CommandBus.WILDCARD, observer.next.bind(observer)))
   }
 
-  addListener<T extends CommandCreator>(
-    type: T,
-    handler: (val: Parameters<T>) => void,
-  ): Function
+  addListener<T extends CommandCreator>(type: T, handler: (val: Parameters<T>) => void): Function
   addListener(type: ListenerType, handler: Function): Function
   addListener(type: ListenerType, handler: Function) {
     const listeners = this.getListeners(type)
@@ -49,10 +44,7 @@ export class CommandBus extends Observable<Command> {
     return handler
   }
 
-  removeListener<T extends CommandCreator>(
-    type: T,
-    handler: (val: Parameters<T>) => void,
-  ): Function
+  removeListener<T extends CommandCreator>(type: T, handler: (val: Parameters<T>) => void): Function
   removeListener(type: ListenerType, handler: Function): Function
   removeListener(type: ListenerType, handler: Function) {
     const listeners = this.getListeners(type)

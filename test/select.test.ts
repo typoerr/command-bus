@@ -18,9 +18,7 @@ const ACTION = {
 test('select command from command-bus', done => {
   expect.assertions(1)
   const bus = new CommandBus()
-  const action$ = select(bus, ACTION.FOO).pipe(
-    tap(x => expect(x).toEqual(ACTION.FOO(1))),
-  )
+  const action$ = select(bus, ACTION.FOO).pipe(tap(x => expect(x).toEqual(ACTION.FOO(1))))
   action$.subscribe(done.bind(undefined, undefined))
   bus.dispatch(ACTION.FOO(1))
 })
@@ -46,9 +44,7 @@ test('select commands from action$', async () => {
 test('select command from eventname', done => {
   expect.assertions(1)
   const bus = new CommandBus()
-  const action$ = select(bus, ACTION.FOO.type).pipe(
-    tap(x => expect(x).toEqual(ACTION.FOO(1))),
-  )
+  const action$ = select(bus, ACTION.FOO.type).pipe(tap(x => expect(x).toEqual(ACTION.FOO(1))))
 
   action$.subscribe(done.bind(undefined, undefined))
   bus.dispatch(ACTION.FOO(1))
