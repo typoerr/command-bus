@@ -4,15 +4,14 @@
   "version": "0.3.9",
   "author": "nullabletypo",
   "files": [
-    "es",
     "dist",
     "README.md",
     "LICENCE"
   ],
-  "main": "dist/index.js",
-  "jsnext:main": "es/index.js",
-  "module": "es/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "jsnext:main": "dist/es/index.js",
+  "module": "dist/es/index.js",
+  "types": "dist/es/index.d.ts",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -43,12 +42,11 @@
   "keywords": [],
   "scripts": {
     "compile": "npm-run-all compile:*",
-    "compile:dist": "tsc --p ./tsconfig.pkg.json --module commonjs --outDir dist",
-    "compile:es": "tsc --p ./tsconfig.pkg.json --module es2015 --outDir es",
+    "compile:cjs": "tsc --module commonjs --outDir dist/cjs",
+    "compile:es": "tsc --module esnext --outDir dist/es",
     "clean": "run-p clean:**",
     "clean:dist": "rimraf dist",
-    "clean:es": "rimraf es",
-    "lint": "tslint src/**/*.ts",
+    "lint": "eslint src/**/*.ts",
     "release:github": "git add . && git commit -am $npm_package_version --allow-empty && git tag $npm_package_version && git push && git push --tags",
     "release": "run-s clean compile test release:github",
     "test": "jest"
