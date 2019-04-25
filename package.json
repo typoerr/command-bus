@@ -1,7 +1,7 @@
 {
   "name": "command-bus",
   "description": "command-bus",
-  "version": "0.3.9",
+  "version": "0.4.0",
   "author": "nullabletypo",
   "files": [
     "dist",
