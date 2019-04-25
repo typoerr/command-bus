@@ -1,4 +1,4 @@
-import { identity, AnyFunction, constant } from '@nullabletypo/utils-js'
+import { identity, AnyFunc, constant } from 'atomic'
 
 export type Command<P, M = undefined> = {
   type: string
@@ -19,7 +19,7 @@ interface MapperSet<T extends any[], R1, R2> {
 export interface CommandCreatorFactoryResult {
   (type: string): CommandCreator<[undefined?], undefined>
   <P>(type: string): CommandCreator<[P], P>
-  <T extends AnyFunction>(type: string, mapper?: T): CommandCreator<
+  <T extends AnyFunc>(type: string, mapper?: T): CommandCreator<
     Parameters<T>,
     ReturnType<T>
   >
@@ -57,7 +57,7 @@ function fromMaperSet(
 export function factory(scope: string): CommandCreatorFactoryResult {
   return function creator(
     type: string,
-    mapper?: AnyFunction | MapperSet<any, any, any>,
+    mapper?: AnyFunc | MapperSet<any, any, any>,
   ) {
     if (typeof mapper === 'function') {
       return fromMapper(scope, type, mapper)
