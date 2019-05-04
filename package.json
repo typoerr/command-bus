@@ -1,8 +1,8 @@
 {
-  "name": "command-bus",
+  "name": "@typoerr/command-bus",
   "description": "command-bus",
   "version": "0.4.0",
-  "author": "nullabletypo",
+  "author": "typoerr",
   "files": [
     "dist",
     "README.md",
@@ -15,12 +15,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nullabletypo/command-bus.git"
+    "url": "https://github.com/typoerr/command-bus.git"
   },
   "bugs": {
-    "url": "https://github.com/nullabletypo/command-bus/issues"
+    "url": "https://github.com/typoerr/command-bus/issues"
   },
-  "homepage": "https://github.com/nullabletypo/command-bus",
+  "homepage": "https://github.com/typoerr/command-bus",
   "dependencies": {
     "@typoerr/atomic": "^0.0.6",
     "rxjs": "^6.5.1"
@@ -48,8 +48,8 @@
     "clean": "run-p clean:**",
     "clean:dist": "rimraf dist",
     "lint": "eslint src/**/*.ts",
-    "release:github": "git add . && git commit -am $npm_package_version --allow-empty && git tag $npm_package_version && git push && git push --tags",
-    "release": "run-s clean compile test release:github",
+    "release": "run-s compile np clean",
+    "np": "np --no-release-draft",
     "test": "jest"
   },
   "jest": {
@@ -60,5 +60,8 @@
         "tsConfig": "test/tsconfig.json"
       }
     }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
