@@ -1,7 +1,7 @@
 # Install
 
 ```
-yarn add https://github.com/nullabletypo/command-bus
+yarn add @typoerr/command-bus
 ```
 
 # Usage
