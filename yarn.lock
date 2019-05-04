@@ -430,6 +430,11 @@
     lodash.unescape "4.0.1"
     semver "5.5.0"
 
+"@typoerr/atomic@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@typoerr/atomic/-/atomic-0.0.6.tgz#8ebe3ab2aa58df22177a7087790e6cb3aa56a09a"
+  integrity sha512-bOL5dP1vwgi31KEWOgdNhCceLdHDw/7BmNnXsnptR7NvfGYfk9/d0t6Z+1ZaFkSxoXwQugYjuCnMsvThI5dMPA==
+
 "@typoerr/eslint-config@^0.0.9":
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/@typoerr/eslint-config/-/eslint-config-0.0.9.tgz#602fe8c1d323eee1dc423ae0b1d07c4141d0e976"
@@ -686,10 +691,6 @@ atob@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
-
-"atomic@https://github.com/nullabletypo/atomic":
-  version "0.0.3"
-  resolved "https://github.com/nullabletypo/atomic#f834a4eedc6c0f13df1d7c2a47d1cd0b83f5f0ae"
 
 aws-sign2@~0.7.0:
   version "0.7.0"

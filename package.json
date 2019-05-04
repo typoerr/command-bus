@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/nullabletypo/command-bus",
   "dependencies": {
-    "atomic": "https://github.com/nullabletypo/atomic",
+    "@typoerr/atomic": "^0.0.6",
     "rxjs": "^6.5.1"
   },
   "devDependencies": {

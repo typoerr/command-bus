@@ -1,4 +1,4 @@
-import { identity, AnyFunc, constant } from 'atomic'
+import { identity, AnyFunc, constant } from '@typoerr/atomic'
 
 export type Command<P, M = undefined> = {
   type: string
