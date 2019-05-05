@@ -1,0 +1,6 @@
+{
+  "name": "@typoerr/command-bus-select",
+  "main": "../dist/cjs/select.js",
+  "module": "../dist/esm/select.js",
+  "types": "../dist/esm/select.d.ts"
+}

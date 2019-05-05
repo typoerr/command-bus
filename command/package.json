@@ -1,0 +1,6 @@
+{
+  "name": "@typoerr/command-bus-command",
+  "main": "../dist/cjs/command.js",
+  "module": "../dist/esm/command.js",
+  "types": "../dist/esm/command.d.ts"
+}

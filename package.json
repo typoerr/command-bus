@@ -5,14 +5,17 @@
   "author": "typoerr",
   "files": [
     "src",
+    "bus",
+    "command",
+    "select",
     "dist",
     "README.md",
     "LICENCE"
   ],
-  "main": "dist/cjs/index.js",
-  "jsnext:main": "dist/es/index.js",
-  "module": "dist/es/index.js",
-  "types": "dist/es/index.d.ts",
+  "main": "dist/cjs/command-bus.js",
+  "jsnext:main": "dist/esm/command-bus.js",
+  "module": "dist/esm/command-bus.js",
+  "types": "dist/esm/command-bus.d.ts",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -44,7 +47,7 @@
   "scripts": {
     "compile": "npm-run-all compile:*",
     "compile:cjs": "tsc --module commonjs --outDir dist/cjs",
-    "compile:es": "tsc --module esnext --outDir dist/es",
+    "compile:esm": "tsc --module esnext --outDir dist/esm",
     "clean": "run-p clean:**",
     "clean:dist": "rimraf dist",
     "lint": "eslint src/**/*.ts",
