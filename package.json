@@ -4,6 +4,7 @@
   "version": "0.4.2",
   "author": "typoerr",
   "files": [
+    "src",
     "dist",
     "README.md",
     "LICENCE"
@@ -48,8 +49,8 @@
     "clean": "run-p clean:**",
     "clean:dist": "rimraf dist",
     "lint": "eslint src/**/*.ts",
-    "release": "run-s compile np clean",
-    "np": "np --no-release-draft",
+    "npm-publish": "yarn publish",
+    "release": "run-s test compile npm-publish clean",
     "test": "jest"
   },
   "jest": {
