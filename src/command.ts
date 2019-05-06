@@ -58,10 +58,11 @@ export function factory(scope: string): CommandCreatorFactoryResult {
 
 export const create = factory('')
 
-export function match<T extends CommandCreator<any, any>>(creator: T) {
-  return (command?: any): command is ReturnType<T> => {
-    return command != null && command.type === creator.type
-  }
+export function match<T extends CommandCreator<any, any>>(
+  creator: T,
+  command: any,
+): command is ReturnType<T> {
+  return command != null && command.type === creator.type
 }
 
 export function isCommand<T extends Command<any, any>>(command: any | T): command is T {

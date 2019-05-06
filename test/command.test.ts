@@ -1,4 +1,4 @@
-import { create, match, isCommand } from '../src/command'
+import { create, isCommand, match } from '../src/command'
 
 test('create', () => {
   const a = create('a')
@@ -18,11 +18,10 @@ test('create', () => {
 })
 
 test('match', () => {
-  const A = create<number>('A')
-  const B = create<number>('B')
-  const isCommandA = match(A)
-  expect(isCommandA(A(1))).toBe(true)
-  expect(isCommandA(B(1))).toBe(false)
+  const a = create<number>('a')
+  const b = create<string>('b')
+  expect(match(a, a(1))).toBe(true)
+  expect(match(a, b('1'))).toBe(false)
 })
 
 test('isCommand', () => {
