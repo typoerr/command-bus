@@ -4,22 +4,22 @@ import { isCommand } from './command'
 
 export type EachReturnType<T> = T extends ((...val: any[]) => infer R)[] ? R : never
 
-export type EELike =
+export type EventEmitterLike =
   | { addEventListener: any; removeEventListener: any }
   | { addListener: any; removeListener: any }
   | { on: any; off: any }
 
-export interface AbsCommand<T = any> {
+export interface CommandLike<T = any> {
   type: string
   payload: T
 }
 
-export interface AbsCommandCreator<T extends AbsCommand = AbsCommand> {
+export interface CommandCreatorLike<T extends CommandLike = CommandLike> {
   type: string
   (...args: any[]): T
 }
 
-function isEELike(src: any): src is EELike {
+function isEELike(src: any): src is EventEmitterLike {
   if ('addEventListener' in src && 'removeEventListener' in src) {
     return true
   } else if ('addListener' in src && 'removeListener' in src) {
@@ -43,12 +43,15 @@ function getType(target: string | { type: string }) {
 /**
  * select a event from EventEmitterLike
  */
-function fromEELike(src: EELike, target: string): Observable<AbsCommand<any>>
-function fromEELike<T extends AbsCommandCreator>(
-  src: EELike,
+function fromEELike(src: EventEmitterLike, target: string): Observable<CommandLike<any>>
+function fromEELike<T extends CommandCreatorLike>(
+  src: EventEmitterLike,
   target: T,
-): Observable<AbsCommand<ReturnType<T>>>
-function fromEELike(src: EELike, target: string | AbsCommandCreator): Observable<AbsCommand<any>> {
+): Observable<CommandLike<ReturnType<T>>>
+function fromEELike(
+  src: EventEmitterLike,
+  target: string | CommandCreatorLike,
+): Observable<CommandLike<any>> {
   const type = getType(target)
   const ensure = (payload: any) => (isCommand(payload) ? payload : { type, payload })
   return fromEvent(src, type).pipe(
@@ -60,9 +63,9 @@ function fromEELike(src: EELike, target: string | AbsCommandCreator): Observable
 /**
  * Select a event from Observable<Command>
  */
-function fromObservable<T extends AbsCommandCreator>(src$: Observable<AbsCommand>, target: T) {
+function fromObservable<T extends CommandCreatorLike>(src$: Observable<CommandLike>, target: T) {
   return src$.pipe(
-    filter((cmd: AbsCommand) => cmd.type === target.type),
+    filter((cmd: CommandLike) => cmd.type === target.type),
     share(),
   )
 }
@@ -70,10 +73,13 @@ function fromObservable<T extends AbsCommandCreator>(src$: Observable<AbsCommand
 /**
  * Select a command from StreamLike
  */
-function select(src: EELike, target: string): Observable<AbsCommand<any>>
-function select<T extends AbsCommandCreator>(source: EELike, target: T): Observable<ReturnType<T>>
-function select<T extends AbsCommandCreator>(
-  source: Observable<AbsCommand>,
+function select(src: EventEmitterLike, target: string): Observable<CommandLike<any>>
+function select<T extends CommandCreatorLike>(
+  source: EventEmitterLike,
+  target: T,
+): Observable<ReturnType<T>>
+function select<T extends CommandCreatorLike>(
+  source: Observable<CommandLike>,
   target: T,
 ): Observable<ReturnType<T>>
 function select(src: any, target: any) {
@@ -83,13 +89,13 @@ function select(src: any, target: any) {
   return fromObservable(src, target)
 }
 
-function each(src: EELike, target: string[]): Observable<AbsCommand<any>>
-function each<T extends AbsCommandCreator>(
-  src: EELike,
+function each(src: EventEmitterLike, target: string[]): Observable<CommandLike<any>>
+function each<T extends CommandCreatorLike>(
+  src: EventEmitterLike,
   target: T[],
 ): Observable<EachReturnType<T[]>>
-function each<T extends AbsCommandCreator>(
-  src: Observable<AbsCommand>,
+function each<T extends CommandCreatorLike>(
+  src: Observable<CommandLike>,
   target: T[],
 ): Observable<EachReturnType<T[]>>
 function each(src: any, target: any[]) {
