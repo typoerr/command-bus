@@ -54,10 +54,7 @@ function fromEELike(
 ): Observable<CommandLike<any>> {
   const type = getType(target)
   const ensure = (payload: any) => (isCommand(payload) ? payload : { type, payload })
-  return fromEvent(src, type).pipe(
-    map(ensure),
-    share(),
-  )
+  return fromEvent(src, type).pipe(map(ensure), share())
 }
 
 /**
