@@ -52,7 +52,7 @@
     "clean:dist": "rimraf dist",
     "lint": "eslint src/**/*.ts",
     "npm-publish": "yarn publish",
-    "release": "run-s test compile npm-publish clean",
+    "release": "run-s -l lint test compile npm-publish clean",
     "test": "jest"
   },
   "jest": {
