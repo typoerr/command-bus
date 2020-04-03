@@ -1,7 +1,7 @@
 {
   "name": "@typoerr/command-bus",
   "description": "command-bus",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "typoerr",
   "files": [
     "src",
@@ -50,9 +50,9 @@
     "compile:esm": "tsc --module esnext --outDir dist/esm",
     "clean": "run-p clean:**",
     "clean:dist": "rimraf dist",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint src/**/*.ts test/**/*.ts",
     "npm-publish": "yarn publish",
-    "release": "run-s -l lint test compile npm-publish clean",
+    "release": "run-s lint test compile npm-publish clean",
     "test": "jest"
   },
   "jest": {
