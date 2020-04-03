@@ -29,7 +29,7 @@ export class CommandBus extends Observable<Command> {
   protected registory = new Map<string | symbol, Set<Function>>()
 
   constructor() {
-    super(observer => this.on(CommandBus.WILDCARD, observer.next.bind(observer)))
+    super((observer) => this.on(CommandBus.WILDCARD, observer.next.bind(observer)))
   }
 
   addListener<T extends CommandCreator>(type: T, handler: (val: T) => void): Function
@@ -59,7 +59,7 @@ export class CommandBus extends Observable<Command> {
       ...(this.getListeners(command) || []),
       ...(this.getListeners(CommandBus.WILDCARD) || []),
     ]
-    listeners.forEach(fn => fn(command))
+    listeners.forEach((fn) => fn(command))
     return command
   }
 

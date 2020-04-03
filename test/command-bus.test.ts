@@ -28,7 +28,7 @@ test('on/dispatch/off', () => {
 test('observable interface', () => {
   expect.assertions(1)
   const bus = new CommandBus()
-  bus.pipe(map(x => x.payload)).subscribe(value => expect(value).toBe(1))
+  bus.pipe(map((x) => x.payload)).subscribe((value) => expect(value).toBe(1))
   bus.dispatch(COMMAND(1))
 })
 

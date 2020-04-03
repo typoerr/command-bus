@@ -7,7 +7,7 @@ test('create', () => {
   const d = create('d', (x: number, y: number) => x + y)
   const e = create('e', {
     payload: (i: number) => i,
-    meta: i => ({ input: i }),
+    meta: (i) => ({ input: i }),
   })
 
   expect(a()).toStrictEqual({ type: 'a', payload: undefined, meta: undefined })
