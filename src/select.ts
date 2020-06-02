@@ -1,13 +1,14 @@
-import { Observable, fromEvent, merge } from 'rxjs'
+import { Observable, fromEvent, merge, isObservable } from 'rxjs'
 import { map, share, filter } from 'rxjs/operators'
 import { isCommand } from './command'
+import { AnyFunction } from '@typoerr/atomic'
 
 export type EachReturnType<T> = T extends ((...val: any[]) => infer R)[] ? R : never
 
 export type EventEmitterLike =
-  | { addEventListener: any; removeEventListener: any }
-  | { addListener: any; removeListener: any }
-  | { on: any; off: any }
+  | { addEventListener: AnyFunction; removeEventListener: AnyFunction }
+  | { addListener: AnyFunction; removeListener: AnyFunction }
+  | { on: AnyFunction; off: AnyFunction }
 
 export interface CommandLike<T = any> {
   type: string
@@ -19,25 +20,8 @@ export interface CommandCreatorLike<T extends CommandLike = CommandLike> {
   (...args: any[]): T
 }
 
-function isEELike(src: any): src is EventEmitterLike {
-  if ('addEventListener' in src && 'removeEventListener' in src) {
-    return true
-  } else if ('addListener' in src && 'removeListener' in src) {
-    return true
-  } else if ('on' in src && 'off' in src) {
-    return true
-  } else {
-    return false
-  }
-}
-
 function getType(target: string | { type: string }) {
-  if (typeof target === 'string') {
-    return target
-  } else if ('type' in target) {
-    return target.type
-  }
-  return ''
+  return typeof target === 'string' ? target : target.type
 }
 
 /**
@@ -68,10 +52,7 @@ function select(src: EventEmitterLike, target: string): Observable<CommandLike<a
 function select<T extends CommandCreatorLike>(source: EventEmitterLike, target: T): Observable<ReturnType<T>>
 function select<T extends CommandCreatorLike>(source: Observable<CommandLike>, target: T): Observable<ReturnType<T>>
 function select(src: any, target: any) {
-  if (isEELike(src)) {
-    return fromEELike(src, target)
-  }
-  return fromObservable(src, target)
+  return isObservable<CommandLike>(src) ? fromObservable(src, target) : fromEELike(src, target)
 }
 
 function each(src: EventEmitterLike, target: string[]): Observable<CommandLike<any>>
