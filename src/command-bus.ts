@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs'
 import { AnyFunction } from '@typoerr/atomic'
 
 interface Command {
@@ -12,15 +11,15 @@ interface CommandCreator {
   (...val: any[]): any
 }
 
-type ListenerType = string | symbol | { type: string }
+const WILDCARD = '*' as const
 
-export class CommandBus extends Observable<Command> {
-  static WILDCARD = '*'
+type ListenerType = string | symbol | { type: string } | typeof WILDCARD
 
-  static getType(type: ListenerType) {
-    return Object(type) === type ? (type as any).type : type
-  }
+function getType(type: ListenerType) {
+  return Object(type) === type ? (type as any).type : type
+}
 
+export class CommandBus {
   /* alias */
   on = this.addListener
   off = this.removeListener
@@ -29,10 +28,6 @@ export class CommandBus extends Observable<Command> {
 
   protected registory = new Map<string | symbol, Set<AnyFunction>>()
 
-  constructor() {
-    super((observer) => this.on(CommandBus.WILDCARD, observer.next.bind(observer)))
-  }
-
   addListener<T extends CommandCreator>(type: T, handler: (val: T) => void): AnyFunction
   addListener(type: ListenerType, handler: AnyFunction): AnyFunction
   addListener(type: ListenerType, handler: AnyFunction) {
@@ -40,7 +35,7 @@ export class CommandBus extends Observable<Command> {
     if (listeners) {
       listeners.add(handler)
     } else {
-      this.registory.set(CommandBus.getType(type), new Set([handler]))
+      this.registory.set(getType(type), new Set<AnyFunction>().add(handler))
     }
     return handler
   }
@@ -56,12 +51,12 @@ export class CommandBus extends Observable<Command> {
   }
 
   dispatch<T extends Command>(command: T) {
-    const listeners = [...(this.getListeners(command) || []), ...(this.getListeners(CommandBus.WILDCARD) || [])]
+    const listeners = [...(this.getListeners(command) || []), ...(this.getListeners('*') || [])]
     listeners.forEach((fn) => fn(command))
     return command
   }
 
   getListeners(type: ListenerType) {
-    return this.registory.get(CommandBus.getType(type))
+    return this.registory.get(getType(type))
   }
 }
