@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs'
+import { AnyFunction } from '@typoerr/atomic'
 
 interface Command {
   type: string
@@ -26,15 +27,15 @@ export class CommandBus extends Observable<Command> {
   addEventListener = this.addListener
   removeEventListener = this.removeListener
 
-  protected registory = new Map<string | symbol, Set<Function>>()
+  protected registory = new Map<string | symbol, Set<AnyFunction>>()
 
   constructor() {
     super((observer) => this.on(CommandBus.WILDCARD, observer.next.bind(observer)))
   }
 
-  addListener<T extends CommandCreator>(type: T, handler: (val: T) => void): Function
-  addListener(type: ListenerType, handler: Function): Function
-  addListener(type: ListenerType, handler: Function) {
+  addListener<T extends CommandCreator>(type: T, handler: (val: T) => void): AnyFunction
+  addListener(type: ListenerType, handler: AnyFunction): AnyFunction
+  addListener(type: ListenerType, handler: AnyFunction) {
     const listeners = this.getListeners(type)
     if (listeners) {
       listeners.add(handler)
@@ -44,9 +45,9 @@ export class CommandBus extends Observable<Command> {
     return handler
   }
 
-  removeListener<T extends CommandCreator>(type: T, handler: (val: T) => void): Function
-  removeListener(type: ListenerType, handler: Function): Function
-  removeListener(type: ListenerType, handler: Function) {
+  removeListener<T extends CommandCreator>(type: T, handler: (val: T) => void): AnyFunction
+  removeListener(type: ListenerType, handler: AnyFunction): AnyFunction
+  removeListener(type: ListenerType, handler: AnyFunction) {
     const listeners = this.getListeners(type)
     if (listeners) {
       listeners.delete(handler)

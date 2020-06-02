@@ -1,4 +1,4 @@
-import { identity, AnyFunc, constant } from '@typoerr/atomic'
+import { identity, AnyFunction, constant } from '@typoerr/atomic'
 
 export interface Command<P, M = undefined> {
   type: string
@@ -19,11 +19,11 @@ interface MapperObject<T extends any[], R1, R2> {
 export interface CommandCreatorFactoryResult {
   (type: string): CommandCreator<[undefined?], undefined>
   <P>(type: string): CommandCreator<[P], P>
-  <T extends AnyFunc>(type: string, mapper?: T): CommandCreator<Parameters<T>, ReturnType<T>>
+  <T extends AnyFunction>(type: string, mapper?: T): CommandCreator<Parameters<T>, ReturnType<T>>
   <T extends any[], P, M>(type: string, mappers?: MapperObject<T, P, M>): CommandCreator<T, P, M>
 }
 
-function fromMapper(scope: string, type: string, mapper?: Function) {
+function fromMapper(scope: string, type: string, mapper?: AnyFunction) {
   type = scope + type
   const create = (...args: any[]) => {
     const payload = (mapper || identity)(...args)
@@ -45,7 +45,7 @@ function fromMaperObject(scope: string, type: string, mappers: MapperObject<any,
 }
 
 export function factory(scope: string): CommandCreatorFactoryResult {
-  return function creator(type: string, mapper?: AnyFunc | MapperObject<any, any, any>) {
+  return function creator(type: string, mapper?: AnyFunction | MapperObject<any, any, any>) {
     if (typeof mapper === 'function') {
       return fromMapper(scope, type, mapper)
     } else if (typeof mapper === 'object') {
