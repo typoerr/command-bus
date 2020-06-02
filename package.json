@@ -26,22 +26,22 @@
   },
   "homepage": "https://github.com/typoerr/command-bus",
   "dependencies": {
-    "@typoerr/atomic": "^0.0.17",
+    "@typoerr/atomic": "^0.0.27",
     "rxjs": "^6.5.5"
   },
   "devDependencies": {
-    "@types/jest": "^25.1.5",
-    "@types/node": "^13.11.0",
-    "@typoerr/eslint-config": "^0.0.27",
-    "eslint": "^6.8.0",
-    "jest": "^25.2.6",
+    "@types/jest": "^25.2.3",
+    "@types/node": "^14.0.9",
+    "@typoerr/eslint-config": "^0.0.33",
+    "eslint": "^7.1.0",
+    "jest": "^26.0.1",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.0.2",
+    "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
-    "ts-jest": "^25.3.0",
-    "ts-node": "^8.8.1",
+    "ts-jest": "^26.1.0",
+    "ts-node": "^8.10.2",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.3"
   },
   "keywords": [],
   "scripts": {
