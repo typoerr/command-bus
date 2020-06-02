@@ -3,7 +3,10 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es6",
-    "lib": ["es2016", "dom"],
+    "lib": [
+      "es2016",
+      "dom"
+    ],
     "declaration": true,
     "outDir": "dist",
     "sourceMap": true,
@@ -18,8 +21,14 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "pretty": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

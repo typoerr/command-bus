@@ -56,10 +56,7 @@ export class CommandBus extends Observable<Command> {
   }
 
   dispatch<T extends Command>(command: T) {
-    const listeners = [
-      ...(this.getListeners(command) || []),
-      ...(this.getListeners(CommandBus.WILDCARD) || []),
-    ]
+    const listeners = [...(this.getListeners(command) || []), ...(this.getListeners(CommandBus.WILDCARD) || [])]
     listeners.forEach((fn) => fn(command))
     return command
   }

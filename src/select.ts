@@ -44,14 +44,8 @@ function getType(target: string | { type: string }) {
  * select a event from EventEmitterLike
  */
 function fromEELike(src: EventEmitterLike, target: string): Observable<CommandLike<any>>
-function fromEELike<T extends CommandCreatorLike>(
-  src: EventEmitterLike,
-  target: T,
-): Observable<CommandLike<ReturnType<T>>>
-function fromEELike(
-  src: EventEmitterLike,
-  target: string | CommandCreatorLike,
-): Observable<CommandLike<any>> {
+function fromEELike<T extends CommandCreatorLike>(src: EventEmitterLike, target: T): Observable<CommandLike<ReturnType<T>>>
+function fromEELike(src: EventEmitterLike, target: string | CommandCreatorLike): Observable<CommandLike<any>> {
   const type = getType(target)
   const ensure = (payload: any) => (isCommand(payload) ? payload : { type, payload })
   return fromEvent(src, type).pipe(map(ensure), share())
@@ -71,14 +65,8 @@ function fromObservable<T extends CommandCreatorLike>(src$: Observable<CommandLi
  * Select a command from StreamLike
  */
 function select(src: EventEmitterLike, target: string): Observable<CommandLike<any>>
-function select<T extends CommandCreatorLike>(
-  source: EventEmitterLike,
-  target: T,
-): Observable<ReturnType<T>>
-function select<T extends CommandCreatorLike>(
-  source: Observable<CommandLike>,
-  target: T,
-): Observable<ReturnType<T>>
+function select<T extends CommandCreatorLike>(source: EventEmitterLike, target: T): Observable<ReturnType<T>>
+function select<T extends CommandCreatorLike>(source: Observable<CommandLike>, target: T): Observable<ReturnType<T>>
 function select(src: any, target: any) {
   if (isEELike(src)) {
     return fromEELike(src, target)
@@ -87,14 +75,8 @@ function select(src: any, target: any) {
 }
 
 function each(src: EventEmitterLike, target: string[]): Observable<CommandLike<any>>
-function each<T extends CommandCreatorLike>(
-  src: EventEmitterLike,
-  target: T[],
-): Observable<EachReturnType<T[]>>
-function each<T extends CommandCreatorLike>(
-  src: Observable<CommandLike>,
-  target: T[],
-): Observable<EachReturnType<T[]>>
+function each<T extends CommandCreatorLike>(src: EventEmitterLike, target: T[]): Observable<EachReturnType<T[]>>
+function each<T extends CommandCreatorLike>(src: Observable<CommandLike>, target: T[]): Observable<EachReturnType<T[]>>
 function each(src: any, target: any[]) {
   const obs = target.map(select.bind(undefined, src))
   return merge(...obs).pipe(share())
