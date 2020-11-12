@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/typoerr/command-bus",
   "dependencies": {
-    "@typoerr/atomic": "^0.0.30",
     "rxjs": "^6.6.3"
   },
   "devDependencies": {

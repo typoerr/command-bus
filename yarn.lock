@@ -814,11 +814,6 @@
     "@typescript-eslint/types" "4.7.0"
     eslint-visitor-keys "^2.0.0"
 
-"@typoerr/atomic@^0.0.30":
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/@typoerr/atomic/-/atomic-0.0.30.tgz#4dcf34b69cacf322d40f7b74b1cf3d832d0a25d6"
-  integrity sha512-OBoQ9UBFKmA8PFZkzXTUjTQgTZILSPcU4H6E6JG+MISI7PDFdeLr7ZmSR0zYAYFLYNeGbfiLwzFdqN+EusTR6Q==
-
 "@typoerr/eslint-config@^0.0.36":
   version "0.0.36"
   resolved "https://registry.yarnpkg.com/@typoerr/eslint-config/-/eslint-config-0.0.36.tgz#1fb5f939bd9db3e53ac6684abfc23a87023e298d"

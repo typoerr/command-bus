@@ -1,4 +1,12 @@
-import { identity, AnyFunction, constant } from '@typoerr/atomic'
+type AnyFunction = (...values: any[]) => any
+
+function identity<T>(v: T, ..._rest: any[]): T {
+  return v
+}
+
+function constant<T>(v: T) {
+  return (..._: any[]) => v
+}
 
 export interface Command<P, M = undefined> {
   type: string

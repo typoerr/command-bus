@@ -1,7 +1,8 @@
 import { Observable, fromEvent, merge, isObservable } from 'rxjs'
 import { map, share, filter } from 'rxjs/operators'
 import { isCommand } from './command'
-import { AnyFunction } from '@typoerr/atomic'
+
+type AnyFunction = (...values: any[]) => any
 
 export type EachReturnType<T> = T extends ((...val: any[]) => infer R)[] ? R : never
 

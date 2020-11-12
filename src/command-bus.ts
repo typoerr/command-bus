@@ -1,4 +1,4 @@
-import { AnyFunction } from '@typoerr/atomic'
+type AnyFunction = (...values: any[]) => any
 
 interface Command {
   type: string
