@@ -1,7 +1,7 @@
 {
   "name": "@typoerr/command-bus",
   "description": "command-bus",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "author": "typoerr",
   "files": [
     "src",
