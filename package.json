@@ -1,7 +1,7 @@
 {
   "name": "@typoerr/command-bus",
   "description": "command-bus",
-  "version": "0.5.9",
+  "version": "0.5.10",
   "author": "typoerr",
   "files": [
     "src",
@@ -26,13 +26,13 @@
   },
   "homepage": "https://github.com/typoerr/command-bus",
   "dependencies": {
-    "rxjs": "^6.6.6"
+    "rxjs": "^6.6.7"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.21",
-    "@types/node": "^14.14.35",
-    "@typoerr/eslint-config": "^0.0.41",
-    "eslint": "^7.22.0",
+    "@types/jest": "^26.0.22",
+    "@types/node": "^14.14.37",
+    "@typoerr/eslint-config": "^0.0.42",
+    "eslint": "^7.23.0",
     "jest": "^26.6.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
