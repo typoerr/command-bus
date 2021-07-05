@@ -33,7 +33,7 @@ function fromEELike<T extends CommandCreatorLike>(src: EventEmitterLike, target:
 function fromEELike(src: EventEmitterLike, target: string | CommandCreatorLike): Observable<CommandLike<any>> {
   const type = getType(target)
   const ensure = (payload: any) => (isCommand(payload) ? payload : { type, payload })
-  return fromEvent(src, type).pipe(map(ensure), share())
+  return fromEvent(src as any, type).pipe(map(ensure), share())
 }
 
 /**
@@ -53,7 +53,7 @@ function select(src: EventEmitterLike, target: string): Observable<CommandLike<a
 function select<T extends CommandCreatorLike>(source: EventEmitterLike, target: T): Observable<ReturnType<T>>
 function select<T extends CommandCreatorLike>(source: Observable<CommandLike>, target: T): Observable<ReturnType<T>>
 function select(src: any, target: any) {
-  return isObservable<CommandLike>(src) ? fromObservable(src, target) : fromEELike(src, target)
+  return isObservable(src) ? fromObservable(src as Observable<any>, target) : fromEELike(src, target)
 }
 
 function each(src: EventEmitterLike, target: string[]): Observable<CommandLike<any>>
